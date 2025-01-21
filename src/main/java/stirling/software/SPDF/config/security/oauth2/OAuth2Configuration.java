@@ -33,8 +33,8 @@ import stirling.software.SPDF.model.provider.KeycloakProvider;
 @Slf4j
 @ConditionalOnProperty(
         value = "security.oauth2.enabled",
-        havingValue = "true",
-        matchIfMissing = false)
+        havingValue = "true"
+)
 public class OAuth2Configuration {
 
     private final ApplicationProperties applicationProperties;
