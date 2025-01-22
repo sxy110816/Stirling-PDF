@@ -4,23 +4,23 @@ import java.util.Collection;
 
 public interface ProviderInterface {
 
-    public Collection<String> getScopes();
+    Collection<String> getScopes();
 
-    public void setScopes(String scopes);
+    void setScopes(String scopes);
 
-    public String getUseAsUsername();
+    String getUseAsUsername();
 
-    public void setUseAsUsername(String useAsUsername);
+    void setUseAsUsername(String useAsUsername);
 
-    public String getIssuer();
+    String getIssuer();
 
-    public void setIssuer(String issuer);
+    void setIssuer(String issuer);
 
-    public String getClientSecret();
+    String getClientSecret();
 
-    public void setClientSecret(String clientSecret);
+    void setClientSecret(String clientSecret);
 
-    public String getClientId();
+    String getClientId();
 
-    public void setClientId(String clientId);
+    void setClientId(String clientId);
 }

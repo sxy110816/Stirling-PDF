@@ -2,7 +2,7 @@ package stirling.software.SPDF.model;
 
 import java.util.Collection;
 
-public class Provider implements ProviderInterface {
+public abstract class Provider implements ProviderInterface {
     private String name;
     private String clientName;
 
