@@ -208,9 +208,10 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                 break;
             case "github":
                 // Add GitHub specific logout URL if needed
+                // todo: why does the redirect go to github? shouldn't it come to Stirling PDF?
                 String githubLogoutUrl = "https://github.com/logout";
-                log.info("Redirecting to GitHub logout URL: " + githubLogoutUrl);
-                response.sendRedirect(githubLogoutUrl);
+                log.info("Redirecting to GitHub logout URL: " + redirect_url);
+                response.sendRedirect(redirect_url);
                 break;
             case "google":
                 // Add Google specific logout URL if needed

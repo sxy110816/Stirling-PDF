@@ -1,80 +1,84 @@
 package stirling.software.SPDF.model;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public abstract class Provider implements ProviderInterface {
+@Getter
+@NoArgsConstructor
+public abstract class Provider {
+
+    private String issuer;
     private String name;
     private String clientName;
+    private String clientId;
+    private String clientSecret;
+    private Collection<String> scopes;
+    private String useAsUsername;
 
-    public String getName() {
-        return name;
+    public Provider(
+            String issuer,
+            String name,
+            String clientName,
+            String clientId,
+            String clientSecret,
+            Collection<String> scopes,
+            String useAsUsername
+    ) {
+        this.issuer = issuer;
+        this.name = name;
+        this.clientName = clientName;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.scopes = scopes;
+        this.useAsUsername = !useAsUsername.isBlank() ? useAsUsername : "email";
     }
 
-    public String getClientName() {
-        return clientName;
+    //    todo: why are we passing name here if it's not used?
+    public boolean isSettingsValid() {
+        return isValid(this.getIssuer(), "issuer")
+                && isValid(this.getClientId(), "clientId")
+                && isValid(this.getClientSecret(), "clientSecret")
+                && isValid(this.getScopes(), "scopes")
+                && isValid(this.getUseAsUsername(), "useAsUsername");
     }
 
-    protected boolean isValid(String value, String name) {
-        if (value != null && !value.trim().isEmpty()) {
-            return true;
-        }
-        return false;
+    private boolean isValid(String value, String name) {
+        return value != null && !value.isBlank();
     }
 
-    protected boolean isValid(Collection<String> value, String name) {
-        if (value != null && !value.isEmpty()) {
-            return true;
-        }
-        return false;
+    private boolean isValid(Collection<String> value, String name) {
+        return value != null && !value.isEmpty();
     }
 
-    @Override
-    public Collection<String> getScopes() {
-        throw new UnsupportedOperationException("Unimplemented method 'getScope'");
+    protected void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
-    @Override
-    public void setScopes(String scopes) {
-        throw new UnsupportedOperationException("Unimplemented method 'setScope'");
+    protected void setName(String name) {
+        this.name = name;
     }
 
-    @Override
-    public String getUseAsUsername() {
-        throw new UnsupportedOperationException("Unimplemented method 'getUseAsUsername'");
+    protected void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
-    @Override
-    public void setUseAsUsername(String useAsUsername) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUseAsUsername'");
+    protected void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
-    @Override
-    public String getIssuer() {
-        throw new UnsupportedOperationException("Unimplemented method 'getIssuer'");
+    protected void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
-    @Override
-    public void setIssuer(String issuer) {
-        throw new UnsupportedOperationException("Unimplemented method 'setIssuer'");
+    protected void setScopes(String scopes) {
+        this.scopes = Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
-    @Override
-    public String getClientSecret() {
-        throw new UnsupportedOperationException("Unimplemented method 'getClientSecret'");
+    protected void setUseAsUsername(String useAsUsername) {
+        this.useAsUsername = useAsUsername;
     }
 
-    @Override
-    public void setClientSecret(String clientSecret) {
-        throw new UnsupportedOperationException("Unimplemented method 'setClientSecret'");
-    }
-
-    @Override
-    public String getClientId() {
-        throw new UnsupportedOperationException("Unimplemented method 'getClientId'");
-    }
-
-    @Override
-    public void setClientId(String clientId) {
-        throw new UnsupportedOperationException("Unimplemented method 'setClientId'");
-    }
 }
