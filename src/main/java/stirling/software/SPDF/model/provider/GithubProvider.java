@@ -1,13 +1,11 @@
 package stirling.software.SPDF.model.provider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import lombok.NoArgsConstructor;
-import stirling.software.SPDF.model.Provider;
 
+// @Setter
 @NoArgsConstructor
 public class GithubProvider extends Provider {
 
@@ -22,7 +20,8 @@ public class GithubProvider extends Provider {
     private Collection<String> scopes = new ArrayList<>();
     private String useAsUsername = "login";
 
-    public GithubProvider(String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
+    public GithubProvider(
+            String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
         super(null, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
         this.clientId = clientId;
         this.clientSecret = clientSecret;

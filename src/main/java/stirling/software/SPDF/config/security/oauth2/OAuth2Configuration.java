@@ -1,5 +1,7 @@
 package stirling.software.SPDF.config.security.oauth2;
 
+import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +30,6 @@ import stirling.software.SPDF.model.User;
 import stirling.software.SPDF.model.provider.GithubProvider;
 import stirling.software.SPDF.model.provider.GoogleProvider;
 import stirling.software.SPDF.model.provider.KeycloakProvider;
-import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 
 @Slf4j
 @Configuration
@@ -41,9 +42,7 @@ public class OAuth2Configuration {
     @Lazy private final UserService userService;
 
     public OAuth2Configuration(
-            ApplicationProperties applicationProperties,
-            @Lazy UserService userService
-    ) {
+            ApplicationProperties applicationProperties, @Lazy UserService userService) {
         this.userService = userService;
         this.applicationProperties = applicationProperties;
     }
@@ -123,11 +122,8 @@ public class OAuth2Configuration {
             return Optional.empty();
         }
 
-        GithubProvider github = applicationProperties
-                .getSecurity()
-                .getOauth2()
-                .getClient()
-                .getGithub();
+        GithubProvider github =
+                applicationProperties.getSecurity().getOauth2().getClient().getGithub();
 
         return github != null && github.isSettingsValid()
                 ? Optional.of(

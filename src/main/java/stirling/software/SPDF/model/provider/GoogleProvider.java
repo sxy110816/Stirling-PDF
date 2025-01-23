@@ -1,15 +1,11 @@
 package stirling.software.SPDF.model.provider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.NoArgsConstructor;
-import stirling.software.SPDF.model.Provider;
 
+// @Setter
 @NoArgsConstructor
 public class GoogleProvider extends Provider {
 
@@ -25,7 +21,8 @@ public class GoogleProvider extends Provider {
     private Collection<String> scopes = new ArrayList<>();
     private String useAsUsername = "email";
 
-    public GoogleProvider(String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
+    public GoogleProvider(
+            String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
         super(null, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -67,5 +64,4 @@ public class GoogleProvider extends Provider {
                 + useAsUsername
                 + "]";
     }
-
 }

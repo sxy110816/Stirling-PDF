@@ -1,13 +1,11 @@
 package stirling.software.SPDF.model.provider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import lombok.NoArgsConstructor;
-import stirling.software.SPDF.model.Provider;
 
+// @Setter
 @NoArgsConstructor
 public class KeycloakProvider extends Provider {
 
@@ -20,7 +18,12 @@ public class KeycloakProvider extends Provider {
     private Collection<String> scopes;
     private String useAsUsername = "email";
 
-    public KeycloakProvider(String issuer, String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
+    public KeycloakProvider(
+            String issuer,
+            String clientId,
+            String clientSecret,
+            Collection<String> scopes,
+            String useAsUsername) {
         super(issuer, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
         this.useAsUsername = useAsUsername;
         this.issuer = issuer;
@@ -56,5 +59,4 @@ public class KeycloakProvider extends Provider {
                 + useAsUsername
                 + "]";
     }
-
 }

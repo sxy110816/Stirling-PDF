@@ -1,8 +1,9 @@
-package stirling.software.SPDF.model;
+package stirling.software.SPDF.model.provider;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,8 +26,7 @@ public abstract class Provider {
             String clientId,
             String clientSecret,
             Collection<String> scopes,
-            String useAsUsername
-    ) {
+            String useAsUsername) {
         this.issuer = issuer;
         this.name = name;
         this.clientName = clientName;
@@ -53,32 +53,32 @@ public abstract class Provider {
         return value != null && !value.isEmpty();
     }
 
-    protected void setIssuer(String issuer) {
+    public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
 
-    protected void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    protected void setClientName(String clientName) {
+    public void setClientName(String clientName) {
         this.clientName = clientName;
     }
 
-    protected void setClientId(String clientId) {
+    public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
-    protected void setClientSecret(String clientSecret) {
+    public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
 
-    protected void setScopes(String scopes) {
-        this.scopes = Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
+    public void setScopes(String scopes) {
+        this.scopes =
+                Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
-    protected void setUseAsUsername(String useAsUsername) {
+    public void setUseAsUsername(String useAsUsername) {
         this.useAsUsername = useAsUsername;
     }
-
 }
