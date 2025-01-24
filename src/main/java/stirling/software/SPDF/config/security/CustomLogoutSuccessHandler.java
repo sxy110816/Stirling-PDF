@@ -197,14 +197,14 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                                 + clientId
                                 + "&post_logout_redirect_uri="
                                 + response.encodeRedirectURL(redirect_url);
-                log.info("Redirecting to Keycloak logout URL: " + logoutUrl);
+                log.info("Redirecting to Keycloak logout URL: {}", logoutUrl);
                 response.sendRedirect(logoutUrl);
             }
             case "github" -> {
                 // Add GitHub specific logout URL if needed
                 // todo: why does the redirect go to github? shouldn't it come to Stirling PDF?
                 String githubLogoutUrl = "https://github.com/logout";
-                log.info("Redirecting to GitHub logout URL: " + redirect_url);
+                log.info("Redirecting to GitHub logout URL: {}", redirect_url);
                 response.sendRedirect(redirect_url);
             }
             case "google" -> {

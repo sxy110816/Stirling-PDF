@@ -64,19 +64,13 @@ public class OAuth2Configuration {
     }
 
     private Optional<ClientRegistration> googleClientRegistration() {
-        OAUTH2 oauth = applicationProperties.getSecurity().getOauth2();
-
-        if (oauth == null || !oauth.getEnabled()) {
+        if (isOauthOrClientEmpty()) {
             return Optional.empty();
         }
 
-        Client client = oauth.getClient();
+        GoogleProvider google =
+                applicationProperties.getSecurity().getOauth2().getClient().getGoogle();
 
-        if (client == null) {
-            return Optional.empty();
-        }
-
-        GoogleProvider google = client.getGoogle();
         return google != null && google.isSettingsValid()
                 ? Optional.of(
                         ClientRegistration.withRegistrationId(google.getName())
@@ -95,15 +89,13 @@ public class OAuth2Configuration {
     }
 
     private Optional<ClientRegistration> keycloakClientRegistration() {
-        OAUTH2 oauth = applicationProperties.getSecurity().getOauth2();
-        if (oauth == null || !oauth.getEnabled()) {
+        if (isOauthOrClientEmpty()) {
             return Optional.empty();
         }
-        Client client = oauth.getClient();
-        if (client == null) {
-            return Optional.empty();
-        }
-        KeycloakProvider keycloak = client.getKeycloak();
+
+        KeycloakProvider keycloak =
+                applicationProperties.getSecurity().getOauth2().getClient().getKeycloak();
+
         return keycloak != null && keycloak.isSettingsValid()
                 ? Optional.of(
                         ClientRegistrations.fromIssuerLocation(keycloak.getIssuer())
@@ -181,7 +173,7 @@ public class OAuth2Configuration {
 
         Client client = oauth.getClient();
 
-        return client != null;
+        return client == null;
     }
 
     /*

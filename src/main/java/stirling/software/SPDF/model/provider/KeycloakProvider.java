@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.NoArgsConstructor;
 
-// @Setter
 @NoArgsConstructor
 public class KeycloakProvider extends Provider {
 

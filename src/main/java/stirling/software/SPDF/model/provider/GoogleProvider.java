@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.NoArgsConstructor;
 
-// @Setter
 @NoArgsConstructor
 public class GoogleProvider extends Provider {
 

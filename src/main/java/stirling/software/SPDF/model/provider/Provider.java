@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public abstract class Provider {
 
@@ -37,6 +37,7 @@ public abstract class Provider {
     }
 
     //    todo: why are we passing name here if it's not used?
+    // todo: use util class/method
     public boolean isSettingsValid() {
         return isValid(this.getIssuer(), "issuer")
                 && isValid(this.getClientId(), "clientId")
@@ -53,32 +54,8 @@ public abstract class Provider {
         return value != null && !value.isEmpty();
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
     public void setScopes(String scopes) {
         this.scopes =
                 Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
-    }
-
-    public void setUseAsUsername(String useAsUsername) {
-        this.useAsUsername = useAsUsername;
     }
 }

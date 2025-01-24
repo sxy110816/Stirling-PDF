@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.NoArgsConstructor;
 
-// @Setter
 @NoArgsConstructor
 public class GithubProvider extends Provider {
 
@@ -22,7 +21,7 @@ public class GithubProvider extends Provider {
 
     public GithubProvider(
             String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
-        super(null, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
+                super(null, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.scopes = scopes;
