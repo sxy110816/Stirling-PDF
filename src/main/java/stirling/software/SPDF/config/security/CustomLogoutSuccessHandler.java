@@ -184,7 +184,7 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
             param = "error=badcredentials";
         }
 
-        String redirect_url = UrlUtils.getOrigin(request) + "/login?" + param;
+        String redirectUrl = UrlUtils.getOrigin(request) + "/login?" + param;
 
         // Redirect based on OAuth2 provider
         switch (registrationId.toLowerCase()) {
@@ -196,30 +196,30 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                                 + "?client_id="
                                 + clientId
                                 + "&post_logout_redirect_uri="
-                                + response.encodeRedirectURL(redirect_url);
+                                + response.encodeRedirectURL(redirectUrl);
                 log.info("Redirecting to Keycloak logout URL: {}", logoutUrl);
                 response.sendRedirect(logoutUrl);
             }
             case "github" -> {
-                // Add GitHub specific logout URL if needed
-                // todo: why does the redirect go to github? shouldn't it come to Stirling PDF?
-                String githubLogoutUrl = "https://github.com/logout";
-                log.info("Redirecting to GitHub logout URL: {}", redirect_url);
-                response.sendRedirect(redirect_url);
+                log.info(
+                        "No redirect URL for GitHub. Redirecting to default logout URL: {}",
+                        redirectUrl);
+                response.sendRedirect(redirectUrl);
             }
             case "google" -> {
                 // Add Google specific logout URL if needed
                 // String googleLogoutUrl =
                 // "https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue="
-                //                 + response.encodeRedirectURL(redirect_url);
+                //                 + response.encodeRedirectURL(redirectUrl);
                 log.info("Google does not have a specific logout URL");
                 // log.info("Redirecting to Google logout URL: " + googleLogoutUrl);
                 // response.sendRedirect(googleLogoutUrl);
             }
             default -> {
-                String defaultRedirectUrl = request.getContextPath() + "/login?" + param;
-                log.info("Redirecting to default logout URL: {}", defaultRedirectUrl);
-                response.sendRedirect(defaultRedirectUrl);
+                //                String defaultRedirectUrl = request.getContextPath() + "/login?" +
+                // param;
+                log.info("Redirecting to default logout URL: {}", redirectUrl);
+                response.sendRedirect(redirectUrl);
             }
         }
     }

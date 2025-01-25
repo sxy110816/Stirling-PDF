@@ -6,7 +6,7 @@ import java.util.Collection;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class GithubProvider extends Provider {
+public class GitHubProvider extends Provider {
 
     private static final String NAME = "github";
     private static final String CLIENT_NAME = "GitHub";
@@ -14,51 +14,67 @@ public class GithubProvider extends Provider {
     private static final String TOKEN_URI = "https://github.com/login/oauth/access_token";
     private static final String USER_INFO_URI = "https://api.github.com/user";
 
-    private String clientId;
-    private String clientSecret;
-    private Collection<String> scopes = new ArrayList<>();
-    private String useAsUsername = "login";
-
-    public GithubProvider(
-            String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
-                super(null, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.scopes = scopes;
-        this.useAsUsername = useAsUsername;
+    public GitHubProvider(String clientId, String clientSecret, String useAsUsername) {
+        super(
+                null,
+                NAME,
+                CLIENT_NAME,
+                clientId,
+                clientSecret,
+                new ArrayList<>(),
+                useAsUsername != null ? useAsUsername : "login",
+                AUTHORIZATION_URI,
+                TOKEN_URI,
+                USER_INFO_URI);
     }
 
+    @Override
     public String getAuthorizationUri() {
         return AUTHORIZATION_URI;
     }
 
+    @Override
     public String getTokenUri() {
         return TOKEN_URI;
     }
 
-    public String getUserinfoUri() {
+    @Override
+    public String getUserInfoUri() {
         return USER_INFO_URI;
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getClientName() {
+        return CLIENT_NAME;
+    }
+
+    @Override
     public Collection<String> getScopes() {
+        Collection<String> scopes = super.getScopes();
+
         if (scopes == null || scopes.isEmpty()) {
             scopes = new ArrayList<>();
             scopes.add("read:user");
         }
+
         return scopes;
     }
 
     @Override
     public String toString() {
         return "GitHub [clientId="
-                + clientId
+                + getClientId()
                 + ", clientSecret="
-                + (clientSecret != null && !clientSecret.isEmpty() ? "MASKED" : "NULL")
+                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "MASKED" : "NULL")
                 + ", scopes="
-                + scopes
+                + getScopes()
                 + ", useAsUsername="
-                + useAsUsername
+                + getUseAsUsername()
                 + "]";
     }
 }

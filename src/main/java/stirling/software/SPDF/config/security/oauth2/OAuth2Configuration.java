@@ -1,6 +1,7 @@
 package stirling.software.SPDF.config.security.oauth2;
 
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
+import static stirling.software.SPDF.utils.validation.Validator.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,9 +28,7 @@ import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2.Client;
 import stirling.software.SPDF.model.User;
-import stirling.software.SPDF.model.provider.GithubProvider;
-import stirling.software.SPDF.model.provider.GoogleProvider;
-import stirling.software.SPDF.model.provider.KeycloakProvider;
+import stirling.software.SPDF.model.provider.Provider;
 
 @Slf4j
 @Configuration
@@ -68,10 +67,9 @@ public class OAuth2Configuration {
             return Optional.empty();
         }
 
-        GoogleProvider google =
-                applicationProperties.getSecurity().getOauth2().getClient().getGoogle();
+        Provider google = applicationProperties.getSecurity().getOauth2().getClient().getGoogle();
 
-        return google != null && google.isSettingsValid()
+        return validateSettings(google)
                 ? Optional.of(
                         ClientRegistration.withRegistrationId(google.getName())
                                 .clientId(google.getClientId())
@@ -79,7 +77,7 @@ public class OAuth2Configuration {
                                 .scope(google.getScopes())
                                 .authorizationUri(google.getAuthorizationUri())
                                 .tokenUri(google.getTokenUri())
-                                .userInfoUri(google.getUserinfoUri())
+                                .userInfoUri(google.getUserInfoUri())
                                 .userNameAttributeName(google.getUseAsUsername())
                                 .clientName(google.getClientName())
                                 .redirectUri(REDIRECT_URI_PATH + google.getName())
@@ -93,10 +91,10 @@ public class OAuth2Configuration {
             return Optional.empty();
         }
 
-        KeycloakProvider keycloak =
+        Provider keycloak =
                 applicationProperties.getSecurity().getOauth2().getClient().getKeycloak();
 
-        return keycloak != null && keycloak.isSettingsValid()
+        return validateSettings(keycloak)
                 ? Optional.of(
                         ClientRegistrations.fromIssuerLocation(keycloak.getIssuer())
                                 .registrationId(keycloak.getName())
@@ -114,10 +112,9 @@ public class OAuth2Configuration {
             return Optional.empty();
         }
 
-        GithubProvider github =
-                applicationProperties.getSecurity().getOauth2().getClient().getGithub();
+        Provider github = applicationProperties.getSecurity().getOauth2().getClient().getGithub();
 
-        return github != null && github.isSettingsValid()
+        return validateSettings(github)
                 ? Optional.of(
                         ClientRegistration.withRegistrationId(github.getName())
                                 .clientId(github.getClientId())
@@ -125,7 +122,7 @@ public class OAuth2Configuration {
                                 .scope(github.getScopes())
                                 .authorizationUri(github.getAuthorizationUri())
                                 .tokenUri(github.getTokenUri())
-                                .userInfoUri(github.getUserinfoUri())
+                                .userInfoUri(github.getUserInfoUri())
                                 .userNameAttributeName(github.getUseAsUsername())
                                 .clientName(github.getClientName())
                                 .redirectUri(REDIRECT_URI_PATH + github.getName())
@@ -180,6 +177,7 @@ public class OAuth2Configuration {
     This following function is to grant Authorities to the OAUTH2 user from the values stored in the database.
     This is required for the internal; 'hasRole()' function to give out the correct role.
      */
+
     @Bean
     @ConditionalOnProperty(
             value = "security.oauth2.enabled",

@@ -11,24 +11,29 @@ public class KeycloakProvider extends Provider {
     private static final String NAME = "keycloak";
     private static final String CLIENT_NAME = "Keycloak";
 
-    private String issuer;
-    private String clientId;
-    private String clientSecret;
-    private Collection<String> scopes;
-    private String useAsUsername = "email";
-
     public KeycloakProvider(
-            String issuer,
-            String clientId,
-            String clientSecret,
-            Collection<String> scopes,
-            String useAsUsername) {
-        super(issuer, NAME, CLIENT_NAME, clientId, clientSecret, scopes, useAsUsername);
-        this.useAsUsername = useAsUsername;
-        this.issuer = issuer;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.scopes = scopes;
+            String issuer, String clientId, String clientSecret, String useAsUsername) {
+        super(
+                issuer,
+                NAME,
+                CLIENT_NAME,
+                clientId,
+                clientSecret,
+                new ArrayList<>(),
+                useAsUsername,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getClientName() {
+        return CLIENT_NAME;
     }
 
     @Override
@@ -47,15 +52,15 @@ public class KeycloakProvider extends Provider {
     @Override
     public String toString() {
         return "Keycloak [issuer="
-                + issuer
+                + getIssuer()
                 + ", clientId="
-                + clientId
+                + getClientId()
                 + ", clientSecret="
-                + (clientSecret != null && !clientSecret.isBlank() ? "MASKED" : "NULL")
+                + (getClientSecret() != null && !getClientSecret().isBlank() ? "MASKED" : "NULL")
                 + ", scopes="
-                + scopes
+                + getScopes()
                 + ", useAsUsername="
-                + useAsUsername
+                + getUseAsUsername()
                 + "]";
     }
 }

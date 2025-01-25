@@ -1,5 +1,7 @@
 package stirling.software.SPDF.controller.web;
 
+import static stirling.software.SPDF.utils.validation.Validator.validateSettings;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -27,7 +29,7 @@ import stirling.software.SPDF.model.ApplicationProperties.Security;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2.Client;
 import stirling.software.SPDF.model.ApplicationProperties.Security.SAML2;
-import stirling.software.SPDF.model.provider.GithubProvider;
+import stirling.software.SPDF.model.provider.GitHubProvider;
 import stirling.software.SPDF.model.provider.GoogleProvider;
 import stirling.software.SPDF.model.provider.KeycloakProvider;
 import stirling.software.SPDF.repository.UserRepository;
@@ -60,28 +62,37 @@ public class AccountWebController {
         if (authentication != null && authentication.isAuthenticated()) {
             return "redirect:/";
         }
+
         Map<String, String> providerList = new HashMap<>();
         Security securityProps = applicationProperties.getSecurity();
         OAUTH2 oauth = securityProps.getOauth2();
+
         if (oauth != null) {
             if (oauth.getEnabled()) {
                 if (oauth.isSettingsValid()) {
                     providerList.put(OAUTH_2_AUTHORIZATION + "oidc", oauth.getProvider());
                 }
+
                 Client client = oauth.getClient();
+
                 if (client != null) {
                     GoogleProvider google = client.getGoogle();
-                    if (google.isSettingsValid()) {
+
+                    if (validateSettings(google)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + google.getName(), google.getClientName());
                     }
-                    GithubProvider github = client.getGithub();
-                    if (github.isSettingsValid()) {
+
+                    GitHubProvider github = client.getGithub();
+
+                    if (validateSettings(github)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + github.getName(), github.getClientName());
                     }
+
                     KeycloakProvider keycloak = client.getKeycloak();
-                    if (keycloak.isSettingsValid()) {
+
+                    if (validateSettings(keycloak)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + keycloak.getName(),
                                 keycloak.getClientName());
@@ -89,101 +100,74 @@ public class AccountWebController {
                 }
             }
         }
+
         SAML2 saml2 = securityProps.getSaml2();
+
         if (securityProps.isSaml2Activ()
                 && applicationProperties.getSystem().getEnableAlphaFunctionality()) {
             providerList.put("/saml2/authenticate/" + saml2.getRegistrationId(), "SAML 2");
         }
+
         // Remove any null keys/values from the providerList
         providerList
                 .entrySet()
                 .removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
         model.addAttribute("providerlist", providerList);
         model.addAttribute("loginMethod", securityProps.getLoginMethod());
+
         boolean altLogin = !providerList.isEmpty() ? securityProps.isAltLogin() : false;
+
         model.addAttribute("altLogin", altLogin);
         model.addAttribute("currentPage", "login");
         String error = request.getParameter("error");
+
         if (error != null) {
             switch (error) {
-                case "badcredentials":
-                    error = "login.invalid";
-                    break;
-                case "locked":
-                    error = "login.locked";
-                    break;
-                case "oauth2AuthenticationError":
-                    error = "userAlreadyExistsOAuthMessage";
-                    break;
-                default:
-                    break;
+                case "badcredentials" -> error = "login.invalid";
+                case "locked" -> error = "login.locked";
+                case "oauth2AuthenticationError" -> error = "userAlreadyExistsOAuthMessage";
             }
+
             model.addAttribute("error", error);
         }
         String erroroauth = request.getParameter("erroroauth");
         if (erroroauth != null) {
             switch (erroroauth) {
-                case "oauth2AutoCreateDisabled":
-                    erroroauth = "login.oauth2AutoCreateDisabled";
-                    break;
-                case "invalidUsername":
-                    erroroauth = "login.invalid";
-                    break;
-                case "userAlreadyExistsWeb":
-                    erroroauth = "userAlreadyExistsWebMessage";
-                    break;
-                case "oauth2AuthenticationErrorWeb":
-                    erroroauth = "login.oauth2InvalidUserType";
-                    break;
-                case "invalid_token_response":
-                    erroroauth = "login.oauth2InvalidTokenResponse";
-                    break;
-                case "authorization_request_not_found":
-                    erroroauth = "login.oauth2RequestNotFound";
-                    break;
-                case "access_denied":
-                    erroroauth = "login.oauth2AccessDenied";
-                    break;
-                case "invalid_user_info_response":
-                    erroroauth = "login.oauth2InvalidUserInfoResponse";
-                    break;
-                case "invalid_request":
-                    erroroauth = "login.oauth2invalidRequest";
-                    break;
-                case "invalid_id_token":
-                    erroroauth = "login.oauth2InvalidIdToken";
-                    break;
-                case "oauth2_admin_blocked_user":
-                    erroroauth = "login.oauth2AdminBlockedUser";
-                    break;
-                case "userIsDisabled":
-                    erroroauth = "login.userIsDisabled";
-                    break;
-                case "invalid_destination":
-                    erroroauth = "login.invalid_destination";
-                    break;
-                case "relying_party_registration_not_found":
-                    erroroauth = "login.relyingPartyRegistrationNotFound";
-                    break;
+                case "oauth2AutoCreateDisabled" -> erroroauth = "login.oauth2AutoCreateDisabled";
+                case "invalidUsername" -> erroroauth = "login.invalid";
+                case "userAlreadyExistsWeb" -> erroroauth = "userAlreadyExistsWebMessage";
+                case "oauth2AuthenticationErrorWeb" -> erroroauth = "login.oauth2InvalidUserType";
+                case "invalid_token_response" -> erroroauth = "login.oauth2InvalidTokenResponse";
+                case "authorization_request_not_found" ->
+                        erroroauth = "login.oauth2RequestNotFound";
+                case "access_denied" -> erroroauth = "login.oauth2AccessDenied";
+                case "invalid_user_info_response" ->
+                        erroroauth = "login.oauth2InvalidUserInfoResponse";
+                case "invalid_request" -> erroroauth = "login.oauth2invalidRequest";
+                case "invalid_id_token" -> erroroauth = "login.oauth2InvalidIdToken";
+                case "oauth2_admin_blocked_user" -> erroroauth = "login.oauth2AdminBlockedUser";
+                case "userIsDisabled" -> erroroauth = "login.userIsDisabled";
+                case "invalid_destination" -> erroroauth = "login.invalid_destination";
+                case "relying_party_registration_not_found" ->
+                        erroroauth = "login.relyingPartyRegistrationNotFound";
                 // Valid InResponseTo was not available from the validation context, unable to
                 // evaluate
-                case "invalid_in_response_to":
-                    erroroauth = "login.invalid_in_response_to";
-                    break;
-                case "not_authentication_provider_found":
-                    erroroauth = "login.not_authentication_provider_found";
-                    break;
-                default:
-                    break;
+                case "invalid_in_response_to" -> erroroauth = "login.invalid_in_response_to";
+                case "not_authentication_provider_found" ->
+                        erroroauth = "login.not_authentication_provider_found";
             }
+
             model.addAttribute("erroroauth", erroroauth);
         }
+
         if (request.getParameter("messageType") != null) {
             model.addAttribute("messageType", "changedCredsMessage");
         }
+
         if (request.getParameter("logout") != null) {
             model.addAttribute("logoutMessage", "You have been logged out.");
         }
+
         return "login";
     }
 

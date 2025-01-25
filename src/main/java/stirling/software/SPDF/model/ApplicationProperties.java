@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import stirling.software.SPDF.config.InstallationPathConfig;
 import stirling.software.SPDF.config.YamlPropertySourceFactory;
 import stirling.software.SPDF.model.exception.UnsupportedProviderException;
-import stirling.software.SPDF.model.provider.GithubProvider;
+import stirling.software.SPDF.model.provider.GitHubProvider;
 import stirling.software.SPDF.model.provider.GoogleProvider;
 import stirling.software.SPDF.model.provider.KeycloakProvider;
 import stirling.software.SPDF.model.provider.Provider;
@@ -253,7 +253,7 @@ public class ApplicationProperties {
             @Data
             public static class Client {
                 private GoogleProvider google = new GoogleProvider();
-                private GithubProvider github = new GithubProvider();
+                private GitHubProvider github = new GitHubProvider();
                 private KeycloakProvider keycloak = new KeycloakProvider();
 
                 public Provider get(String registrationId) throws UnsupportedProviderException {

@@ -18,6 +18,9 @@ public abstract class Provider {
     private String clientSecret;
     private Collection<String> scopes;
     private String useAsUsername;
+    private String authorizationUri;
+    private String tokenUri;
+    private String userInfoUri;
 
     public Provider(
             String issuer,
@@ -26,7 +29,10 @@ public abstract class Provider {
             String clientId,
             String clientSecret,
             Collection<String> scopes,
-            String useAsUsername) {
+            String useAsUsername,
+            String authorizationUri,
+            String tokenUri,
+            String userInfoUri) {
         this.issuer = issuer;
         this.name = name;
         this.clientName = clientName;
@@ -34,28 +40,15 @@ public abstract class Provider {
         this.clientSecret = clientSecret;
         this.scopes = scopes;
         this.useAsUsername = !useAsUsername.isBlank() ? useAsUsername : "email";
-    }
-
-    //    todo: why are we passing name here if it's not used?
-    // todo: use util class/method
-    public boolean isSettingsValid() {
-        return isValid(this.getIssuer(), "issuer")
-                && isValid(this.getClientId(), "clientId")
-                && isValid(this.getClientSecret(), "clientSecret")
-                && isValid(this.getScopes(), "scopes")
-                && isValid(this.getUseAsUsername(), "useAsUsername");
-    }
-
-    private boolean isValid(String value, String name) {
-        return value != null && !value.isBlank();
-    }
-
-    private boolean isValid(Collection<String> value, String name) {
-        return value != null && !value.isEmpty();
+        this.authorizationUri = authorizationUri;
+        this.tokenUri = tokenUri;
+        this.userInfoUri = userInfoUri;
     }
 
     public void setScopes(String scopes) {
-        this.scopes =
-                Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
+        if (scopes != null && !scopes.isBlank()) {
+            this.scopes =
+                    Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
+        }
     }
 }
