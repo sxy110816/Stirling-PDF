@@ -12,14 +12,18 @@ public class KeycloakProvider extends Provider {
     private static final String CLIENT_NAME = "Keycloak";
 
     public KeycloakProvider(
-            String issuer, String clientId, String clientSecret, String useAsUsername) {
+            String issuer,
+            String clientId,
+            String clientSecret,
+            Collection<String> scopes,
+            String useAsUsername) {
         super(
                 issuer,
                 NAME,
                 CLIENT_NAME,
                 clientId,
                 clientSecret,
-                new ArrayList<>(),
+                scopes,
                 useAsUsername,
                 null,
                 null,
@@ -38,7 +42,7 @@ public class KeycloakProvider extends Provider {
 
     @Override
     public Collection<String> getScopes() {
-        var scopes = super.getScopes();
+        Collection<String> scopes = super.getScopes();
 
         if (scopes == null || scopes.isEmpty()) {
             scopes = new ArrayList<>();
@@ -56,7 +60,7 @@ public class KeycloakProvider extends Provider {
                 + ", clientId="
                 + getClientId()
                 + ", clientSecret="
-                + (getClientSecret() != null && !getClientSecret().isBlank() ? "MASKED" : "NULL")
+                + (getClientSecret() != null && !getClientSecret().isBlank() ? "*****" : "NULL")
                 + ", scopes="
                 + getScopes()
                 + ", useAsUsername="

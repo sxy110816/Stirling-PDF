@@ -1,6 +1,6 @@
 package stirling.software.SPDF.controller.web;
 
-import static stirling.software.SPDF.utils.validation.Validator.validateSettings;
+import static stirling.software.SPDF.utils.validation.Validator.validateProvider;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -40,12 +40,11 @@ import stirling.software.SPDF.repository.UserRepository;
 public class AccountWebController {
 
     public static final String OAUTH_2_AUTHORIZATION = "/oauth2/authorization/";
+
     private final ApplicationProperties applicationProperties;
-
     private final SessionPersistentRegistry sessionPersistentRegistry;
-
-    private final UserRepository // Assuming you have a repository for user operations
-            userRepository;
+    // Assuming you have a repository for user operations
+    private final UserRepository userRepository;
 
     public AccountWebController(
             ApplicationProperties applicationProperties,
@@ -70,7 +69,10 @@ public class AccountWebController {
         if (oauth != null) {
             if (oauth.getEnabled()) {
                 if (oauth.isSettingsValid()) {
-                    providerList.put(OAUTH_2_AUTHORIZATION + "oidc", oauth.getProvider());
+                    String firstChar = String.valueOf(oauth.getProvider().charAt(0));
+                    String clientName =
+                            oauth.getProvider().replaceFirst(firstChar, firstChar.toUpperCase());
+                    providerList.put(OAUTH_2_AUTHORIZATION + "oidc", clientName);
                 }
 
                 Client client = oauth.getClient();
@@ -78,21 +80,21 @@ public class AccountWebController {
                 if (client != null) {
                     GoogleProvider google = client.getGoogle();
 
-                    if (validateSettings(google)) {
+                    if (validateProvider(google)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + google.getName(), google.getClientName());
                     }
 
                     GitHubProvider github = client.getGithub();
 
-                    if (validateSettings(github)) {
+                    if (validateProvider(github)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + github.getName(), github.getClientName());
                     }
 
                     KeycloakProvider keycloak = client.getKeycloak();
 
-                    if (validateSettings(keycloak)) {
+                    if (validateProvider(keycloak)) {
                         providerList.put(
                                 OAUTH_2_AUTHORIZATION + keycloak.getName(),
                                 keycloak.getClientName());
@@ -103,7 +105,7 @@ public class AccountWebController {
 
         SAML2 saml2 = securityProps.getSaml2();
 
-        if (securityProps.isSaml2Activ()
+        if (securityProps.isSaml2Active()
                 && applicationProperties.getSystem().getEnableAlphaFunctionality()) {
             providerList.put("/saml2/authenticate/" + saml2.getRegistrationId(), "SAML 2");
         }
@@ -321,40 +323,28 @@ public class AccountWebController {
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
             String username = null;
-            if (principal instanceof UserDetails) {
-                // Cast the principal object to UserDetails
-                UserDetails userDetails = (UserDetails) principal;
+            if (principal instanceof UserDetails userDetails) {
                 // Retrieve username and other attributes
                 username = userDetails.getUsername();
                 // Add oAuth2 Login attributes to the model
                 model.addAttribute("oAuth2Login", false);
             }
-            if (principal instanceof OAuth2User) {
-                // Cast the principal object to OAuth2User
-                OAuth2User userDetails = (OAuth2User) principal;
+            if (principal instanceof OAuth2User userDetails) {
                 // Retrieve username and other attributes
-                username =
-                        userDetails.getAttribute(
-                                applicationProperties.getSecurity().getOauth2().getUseAsUsername());
+                username = userDetails.getName();
                 // Add oAuth2 Login attributes to the model
                 model.addAttribute("oAuth2Login", true);
             }
-            if (principal instanceof CustomSaml2AuthenticatedPrincipal) {
-                // Cast the principal object to OAuth2User
-                CustomSaml2AuthenticatedPrincipal userDetails =
-                        (CustomSaml2AuthenticatedPrincipal) principal;
+            if (principal instanceof CustomSaml2AuthenticatedPrincipal userDetails) {
                 // Retrieve username and other attributes
                 username = userDetails.getName();
                 // Add oAuth2 Login attributes to the model
                 model.addAttribute("oAuth2Login", true);
             }
             if (username != null) {
-                // Fetch user details from the database
-                Optional<User> user =
-                        userRepository
-                                .findByUsernameIgnoreCaseWithSettings( // Assuming findByUsername
-                                        // method exists
-                                        username);
+                // Fetch user details from the database, assuming findByUsername method exists
+                Optional<User> user = userRepository.findByUsernameIgnoreCaseWithSettings(username);
+
                 if (!user.isPresent()) {
                     return "redirect:/error";
                 }
@@ -368,31 +358,20 @@ public class AccountWebController {
                     log.error("exception", e);
                     return "redirect:/error";
                 }
+
                 String messageType = request.getParameter("messageType");
                 if (messageType != null) {
                     switch (messageType) {
-                        case "notAuthenticated":
-                            messageType = "notAuthenticatedMessage";
-                            break;
-                        case "userNotFound":
-                            messageType = "userNotFoundMessage";
-                            break;
-                        case "incorrectPassword":
-                            messageType = "incorrectPasswordMessage";
-                            break;
-                        case "usernameExists":
-                            messageType = "usernameExistsMessage";
-                            break;
-                        case "invalidUsername":
-                            messageType = "invalidUsernameMessage";
-                            break;
-                        default:
-                            break;
+                        case "notAuthenticated" -> messageType = "notAuthenticatedMessage";
+                        case "userNotFound" -> messageType = "userNotFoundMessage";
+                        case "incorrectPassword" -> messageType = "incorrectPasswordMessage";
+                        case "usernameExists" -> messageType = "usernameExistsMessage";
+                        case "invalidUsername" -> messageType = "invalidUsernameMessage";
                     }
-                    model.addAttribute("messageType", messageType);
                 }
                 // Add attributes to the model
                 model.addAttribute("username", username);
+                model.addAttribute("messageType", messageType);
                 model.addAttribute("role", user.get().getRolesAsString());
                 model.addAttribute("settings", settingsJson);
                 model.addAttribute("changeCredsFlag", user.get().isFirstLogin());

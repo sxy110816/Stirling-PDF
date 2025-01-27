@@ -6,7 +6,7 @@ import stirling.software.SPDF.model.provider.Provider;
 
 public class Validator {
 
-    public static boolean validateSettings(Provider provider) {
+    public static boolean validateProvider(Provider provider) {
         if (provider == null) {
             return false;
         }
@@ -23,14 +23,18 @@ public class Validator {
             return false;
         }
 
-        return !isStringEmpty(provider.getUseAsUsername());
+        if (isStringEmpty(provider.getUseAsUsername())) {
+            return false;
+        }
+
+        return true;
     }
 
-    private static boolean isStringEmpty(String input) {
+    public static boolean isStringEmpty(String input) {
         return input == null || input.isBlank();
     }
 
-    private static boolean isCollectionEmpty(Collection<String> input) {
+    public static boolean isCollectionEmpty(Collection<String> input) {
         return input == null || input.isEmpty();
     }
 }

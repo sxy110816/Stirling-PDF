@@ -1,5 +1,7 @@
 package stirling.software.SPDF.model;
 
+import static stirling.software.SPDF.utils.validation.Validator.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -243,11 +245,11 @@ public class ApplicationProperties {
             }
 
             public boolean isSettingsValid() {
-                return isValid(this.getIssuer(), "issuer")
-                        && isValid(this.getClientId(), "clientId")
-                        && isValid(this.getClientSecret(), "clientSecret")
-                        && isValid(this.getScopes(), "scopes")
-                        && isValid(this.getUseAsUsername(), "useAsUsername");
+                return isStringEmpty(this.getIssuer())
+                        && isStringEmpty(this.getClientId())
+                        && isStringEmpty(this.getClientSecret())
+                        && isCollectionEmpty(this.getScopes())
+                        && isStringEmpty(this.getUseAsUsername());
             }
 
             @Data
@@ -261,8 +263,10 @@ public class ApplicationProperties {
                         case "google" -> getGoogle();
                         case "github" -> getGithub();
                         case "keycloak" -> getKeycloak();
-                        default -> throw new UnsupportedProviderException(
-                                "Logout from the provider is not supported. Report it at https://github.com/Stirling-Tools/Stirling-PDF/issues");
+                        default ->
+                                throw new UnsupportedProviderException(
+                                        "Logout from the provider " + registrationId + " is not supported. "
+                                                + "Report it at https://github.com/Stirling-Tools/Stirling-PDF/issues");
                     };
                 }
             }

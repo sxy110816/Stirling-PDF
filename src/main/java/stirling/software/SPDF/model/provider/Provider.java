@@ -1,5 +1,8 @@
 package stirling.software.SPDF.model.provider;
 
+import static stirling.software.SPDF.utils.validation.Validator.isStringEmpty;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -9,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public abstract class Provider {
+public class Provider {
 
     private String issuer;
     private String name;
@@ -38,8 +41,8 @@ public abstract class Provider {
         this.clientName = clientName;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.scopes = scopes;
-        this.useAsUsername = !useAsUsername.isBlank() ? useAsUsername : "email";
+        this.scopes = scopes == null ? new ArrayList<>() : scopes;
+        this.useAsUsername = isStringEmpty(useAsUsername) ? "email" : useAsUsername;
         this.authorizationUri = authorizationUri;
         this.tokenUri = tokenUri;
         this.userInfoUri = userInfoUri;
@@ -50,5 +53,24 @@ public abstract class Provider {
             this.scopes =
                     Arrays.stream(scopes.split(",")).map(String::trim).collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Provider [issuer="
+                + getIssuer()
+                + ", name="
+                + getName()
+                + ", clientName="
+                + getClientName()
+                + ", clientId="
+                + getClientId()
+                + ", clientSecret="
+                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "*****" : "NULL")
+                + ", scopes="
+                + getScopes()
+                + ", useAsUsername="
+                + getUseAsUsername()
+                + "]";
     }
 }

@@ -30,20 +30,22 @@ class ValidatorTest {
         when(provider.getScopes()).thenReturn(List.of("read:user"));
         when(provider.getUseAsUsername()).thenReturn("email");
 
-        assertTrue(Validator.validateSettings(provider));
+        assertTrue(Validator.validateProvider(provider));
     }
 
     @ParameterizedTest
     @MethodSource("providerParams")
     void testUnsuccessfulValidation(Provider provider) {
-        assertFalse(Validator.validateSettings(provider));
+        assertFalse(Validator.validateProvider(provider));
     }
 
     public static Stream<Arguments> providerParams() {
-        var generic = new GitHubProvider(null, "clientSecret", "  ");
-        var google = new GoogleProvider(null, "clientSecret", "email");
-        var github = new GitHubProvider("clientId", "", "email");
-        var keycloak = new KeycloakProvider("issuer", "clientId", "clientSecret", "         ");
+        Provider generic = null;
+        var google = new GoogleProvider(null, "clientSecret", List.of("scope"), "email");
+        var github = new GitHubProvider("clientId", "", List.of("scope"), "login");
+        var keycloak = new KeycloakProvider("issuer", "clientId", "clientSecret", List.of("scope"), "email");
+
+        keycloak.setUseAsUsername(null);
 
         return Stream.of(
                 Arguments.of(generic),

@@ -1,32 +1,27 @@
 package stirling.software.SPDF.config.security;
 
+import com.coveo.saml.SamlClient;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
-
-import com.coveo.saml.SamlClient;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import stirling.software.SPDF.SPDFApplication;
 import stirling.software.SPDF.config.security.saml2.CertificateUtils;
 import stirling.software.SPDF.config.security.saml2.CustomSaml2AuthenticatedPrincipal;
 import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2;
 import stirling.software.SPDF.model.ApplicationProperties.Security.SAML2;
-import stirling.software.SPDF.model.exception.UnsupportedProviderException;
-import stirling.software.SPDF.model.provider.Provider;
 import stirling.software.SPDF.utils.UrlUtils;
 
 @Slf4j
@@ -36,23 +31,20 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public void onLogoutSuccess(
-            HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
-
         if (!response.isCommitted()) {
             // Handle user logout due to disabled account
             if (request.getParameter("userIsDisabled") != null) {
-                response.sendRedirect(
-                        request.getContextPath() + "/login?erroroauth=userIsDisabled");
-                return;
+                response.sendRedirect(request.getContextPath() + "/login?erroroauth=userIsDisabled");
             }
+
             // Handle OAuth2 authentication error
             if (request.getParameter("oauth2AuthenticationErrorWeb") != null) {
                 response.sendRedirect(
                         request.getContextPath() + "/login?erroroauth=userAlreadyExistsWeb");
-                return;
             }
+
             if (authentication != null) {
                 // Handle SAML2 logout redirection
                 if (authentication instanceof Saml2Authentication) {
@@ -66,10 +58,11 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                 else if (authentication instanceof UsernamePasswordAuthenticationToken) {
                     getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
                 }
+
                 // Handle unknown authentication types
                 else {
                     log.error(
-                            "authentication class unknown: {}",
+                            "Authentication class unknown: {}",
                             authentication.getClass().getSimpleName());
                     getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
                 }
@@ -145,27 +138,15 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
             HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
         String param = "logout=true";
-        String registrationId = null;
-        String issuer = null;
-        String clientId = null;
+        String registrationId;
+        String errorMessage;
         OAUTH2 oauth = applicationProperties.getSecurity().getOauth2();
 
         if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
             registrationId = oauthToken.getAuthorizedClientRegistrationId();
-
-            try {
-                // Get OAuth2 provider details from configuration
-                Provider provider = oauth.getClient().get(registrationId);
-            } catch (UnsupportedProviderException e) {
-                log.error(e.getMessage());
-            }
         } else {
             registrationId = oauth.getProvider() != null ? oauth.getProvider() : "";
         }
-
-        issuer = oauth.getIssuer();
-        clientId = oauth.getClientId();
-        String errorMessage = "";
 
         // Handle different error scenarios during logout
         if (request.getParameter("oauth2AuthenticationErrorWeb") != null) {
@@ -189,12 +170,11 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
         // Redirect based on OAuth2 provider
         switch (registrationId.toLowerCase()) {
             case "keycloak" -> {
-                // Add Keycloak specific logout URL if needed
                 String logoutUrl =
-                        issuer
+                        oauth.getIssuer()
                                 + "/protocol/openid-connect/logout"
                                 + "?client_id="
-                                + clientId
+                                + oauth.getClientId()
                                 + "&post_logout_redirect_uri="
                                 + response.encodeRedirectURL(redirectUrl);
                 log.info("Redirecting to Keycloak logout URL: {}", logoutUrl);
@@ -206,18 +186,13 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                         redirectUrl);
                 response.sendRedirect(redirectUrl);
             }
-            case "google" -> {
-                // Add Google specific logout URL if needed
-                // String googleLogoutUrl =
+            case "google" -> // String googleLogoutUrl =
                 // "https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue="
                 //                 + response.encodeRedirectURL(redirectUrl);
-                log.info("Google does not have a specific logout URL");
                 // log.info("Redirecting to Google logout URL: " + googleLogoutUrl);
                 // response.sendRedirect(googleLogoutUrl);
-            }
+                    log.info("Google does not have a specific logout URL");
             default -> {
-                //                String defaultRedirectUrl = request.getContextPath() + "/login?" +
-                // param;
                 log.info("Redirecting to default logout URL: {}", redirectUrl);
                 response.sendRedirect(redirectUrl);
             }

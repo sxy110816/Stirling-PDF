@@ -15,14 +15,15 @@ public class GoogleProvider extends Provider {
     private static final String USER_INFO_URI =
             "https://www.googleapis.com/oauth2/v3/userinfo?alt=json";
 
-    public GoogleProvider(String clientId, String clientSecret, String useAsUsername) {
+    public GoogleProvider(
+            String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
         super(
                 null,
                 NAME,
                 CLIENT_NAME,
                 clientId,
                 clientSecret,
-                new ArrayList<>(),
+                scopes,
                 useAsUsername,
                 AUTHORIZATION_URI,
                 TOKEN_URI,
@@ -69,7 +70,7 @@ public class GoogleProvider extends Provider {
         return "Google [clientId="
                 + getClientId()
                 + ", clientSecret="
-                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "MASKED" : "NULL")
+                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "*****" : "NULL")
                 + ", scopes="
                 + getScopes()
                 + ", useAsUsername="

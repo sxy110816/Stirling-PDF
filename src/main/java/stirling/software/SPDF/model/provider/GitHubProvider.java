@@ -14,14 +14,15 @@ public class GitHubProvider extends Provider {
     private static final String TOKEN_URI = "https://github.com/login/oauth/access_token";
     private static final String USER_INFO_URI = "https://api.github.com/user";
 
-    public GitHubProvider(String clientId, String clientSecret, String useAsUsername) {
+    public GitHubProvider(
+            String clientId, String clientSecret, Collection<String> scopes, String useAsUsername) {
         super(
                 null,
                 NAME,
                 CLIENT_NAME,
                 clientId,
                 clientSecret,
-                new ArrayList<>(),
+                scopes,
                 useAsUsername != null ? useAsUsername : "login",
                 AUTHORIZATION_URI,
                 TOKEN_URI,
@@ -70,7 +71,7 @@ public class GitHubProvider extends Provider {
         return "GitHub [clientId="
                 + getClientId()
                 + ", clientSecret="
-                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "MASKED" : "NULL")
+                + (getClientSecret() != null && !getClientSecret().isEmpty() ? "*****" : "NULL")
                 + ", scopes="
                 + getScopes()
                 + ", useAsUsername="
