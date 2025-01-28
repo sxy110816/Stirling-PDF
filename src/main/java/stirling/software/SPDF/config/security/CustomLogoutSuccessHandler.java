@@ -129,10 +129,9 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
     private void getRedirect_oauth2(
             HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
-        String param = "logout=true";
         String registrationId;
-        String errorMessage;
         OAUTH2 oauth = applicationProperties.getSecurity().getOauth2();
+        String path = checkForErrors(request);
 
         if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
             registrationId = oauthToken.getAuthorizedClientRegistrationId();
@@ -140,24 +139,7 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
             registrationId = oauth.getProvider() != null ? oauth.getProvider() : "";
         }
 
-        // Handle different error scenarios during logout
-        if (request.getParameter("oAuth2AuthenticationErrorWeb") != null) {
-            param = "errorOAuth=userAlreadyExistsWeb";
-        } else if ((errorMessage = request.getParameter("errorOAuth")) != null) {
-            param = "errorOAuth=" + sanitizeInput(errorMessage);
-        } else if (request.getParameter("oAuth2AutoCreateDisabled") != null) {
-            param = "errorOAuth=oAuth2AutoCreateDisabled";
-        } else if (request.getParameter("oAuth2AdminBlockedUser") != null) {
-            param = "errorOAuth=oAuth2AdminBlockedUser";
-        } else if (request.getParameter("userIsDisabled") != null) {
-            param = "errorOAuth=userIsDisabled";
-        } else if ((errorMessage = request.getParameter("error")) != null) {
-            param = "errorOAuth=" + sanitizeInput(errorMessage);
-        } else if (request.getParameter("badCredentials") != null) {
-            param = "errorOAuth=badCredentials";
-        }
-
-        String redirectUrl = UrlUtils.getOrigin(request) + "/login?" + param;
+        String redirectUrl = UrlUtils.getOrigin(request) + "/login?" + path;
 
         // Redirect based on OAuth2 provider
         switch (registrationId.toLowerCase()) {
@@ -184,6 +166,34 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                 response.sendRedirect(redirectUrl);
             }
         }
+    }
+
+    /**
+     * Handles different error scenarios during logout. Will return a <code>String</code> containing the error request parameter.
+     * @param request the user's <code>HttpServletRequest</code> request.
+     * @return a <code>String</code> containing the error request parameter.
+     */
+    private String checkForErrors(HttpServletRequest request) {
+        String errorMessage;
+        String path = "logout=true";
+
+        if (request.getParameter("oAuth2AuthenticationErrorWeb") != null) {
+            path = "errorOAuth=userAlreadyExistsWeb";
+        } else if ((errorMessage = request.getParameter("errorOAuth")) != null) {
+            path = "errorOAuth=" + sanitizeInput(errorMessage);
+        } else if (request.getParameter("oAuth2AutoCreateDisabled") != null) {
+            path = "errorOAuth=oAuth2AutoCreateDisabled";
+        } else if (request.getParameter("oAuth2AdminBlockedUser") != null) {
+            path = "errorOAuth=oAuth2AdminBlockedUser";
+        } else if (request.getParameter("userIsDisabled") != null) {
+            path = "errorOAuth=userIsDisabled";
+        } else if ((errorMessage = request.getParameter("error")) != null) {
+            path = "errorOAuth=" + sanitizeInput(errorMessage);
+        } else if (request.getParameter("badCredentials") != null) {
+            path = "errorOAuth=badCredentials";
+        }
+
+        return path;
     }
 
     /**
