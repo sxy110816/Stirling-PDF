@@ -83,13 +83,13 @@ public class CustomOAuth2AuthenticationSuccessHandler
                     && userService.hasPassword(username)
                     && !userService.isAuthenticationTypeByUsername(username, AuthenticationType.SSO)
                     && oAuth.getAutoCreateUser()) {
-                response.sendRedirect(contextPath + "/logout?oauth2AuthenticationErrorWeb=true");
+                response.sendRedirect(contextPath + "/logout?oAuth2AuthenticationErrorWeb=true");
             }
 
             try {
                 if (oAuth.getBlockRegistration()
                         && !userService.usernameExistsIgnoreCase(username)) {
-                    response.sendRedirect(contextPath + "/logout?oauth2_admin_blocked_user=true");
+                    response.sendRedirect(contextPath + "/logout?oAuth2AdminBlockedUser=true");
                 }
                 if (principal instanceof OAuth2User) {
                     userService.processSSOPostLogin(username, oAuth.getAutoCreateUser());

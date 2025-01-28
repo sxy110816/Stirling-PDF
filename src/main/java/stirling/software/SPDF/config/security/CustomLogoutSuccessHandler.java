@@ -1,21 +1,24 @@
 package stirling.software.SPDF.config.security;
 
-import com.coveo.saml.SamlClient;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+
+import com.coveo.saml.SamlClient;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import stirling.software.SPDF.SPDFApplication;
 import stirling.software.SPDF.config.security.saml2.CertificateUtils;
 import stirling.software.SPDF.config.security.saml2.CustomSaml2AuthenticatedPrincipal;
@@ -28,47 +31,36 @@ import stirling.software.SPDF.utils.UrlUtils;
 @AllArgsConstructor
 public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
+    public static final String LOGOUT_PATH = "/login?logout=true";
+
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+    public void onLogoutSuccess(
+            HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException {
         if (!response.isCommitted()) {
-            // Handle user logout due to disabled account
-            if (request.getParameter("userIsDisabled") != null) {
-                response.sendRedirect(request.getContextPath() + "/login?erroroauth=userIsDisabled");
-            }
-
-            // Handle OAuth2 authentication error
-            if (request.getParameter("oauth2AuthenticationErrorWeb") != null) {
-                response.sendRedirect(
-                        request.getContextPath() + "/login?erroroauth=userAlreadyExistsWeb");
-            }
-
             if (authentication != null) {
-                // Handle SAML2 logout redirection
                 if (authentication instanceof Saml2Authentication) {
+                    // Handle SAML2 logout redirection
                     getRedirect_saml2(request, response, authentication);
-                }
-                // Handle OAuth2 logout redirection
-                else if (authentication instanceof OAuth2AuthenticationToken) {
+                } else if (authentication instanceof OAuth2AuthenticationToken) {
+                    // Handle OAuth2 logout redirection
                     getRedirect_oauth2(request, response, authentication);
                 }
                 // Handle Username/Password logout
                 else if (authentication instanceof UsernamePasswordAuthenticationToken) {
-                    getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
-                }
-
-                // Handle unknown authentication types
-                else {
+                    getRedirectStrategy().sendRedirect(request, response, LOGOUT_PATH);
+                } else {
+                    // Handle unknown authentication types
                     log.error(
                             "Authentication class unknown: {}",
                             authentication.getClass().getSimpleName());
-                    getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
+                    getRedirectStrategy().sendRedirect(request, response, LOGOUT_PATH);
                 }
             } else {
                 // Redirect to login page after logout
-                getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
+                getRedirectStrategy().sendRedirect(request, response, LOGOUT_PATH);
             }
         }
     }
@@ -129,7 +121,7 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
             samlClient.redirectToIdentityProvider(response, null, nameIdValue);
         } catch (Exception e) {
             log.error(nameIdValue, e);
-            getRedirectStrategy().sendRedirect(request, response, "/login?logout=true");
+            getRedirectStrategy().sendRedirect(request, response, LOGOUT_PATH);
         }
     }
 
@@ -149,20 +141,20 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
         }
 
         // Handle different error scenarios during logout
-        if (request.getParameter("oauth2AuthenticationErrorWeb") != null) {
-            param = "erroroauth=oauth2AuthenticationErrorWeb";
-        } else if ((errorMessage = request.getParameter("error")) != null) {
-            param = "error=" + sanitizeInput(errorMessage);
-        } else if ((errorMessage = request.getParameter("erroroauth")) != null) {
-            param = "erroroauth=" + sanitizeInput(errorMessage);
-        } else if (request.getParameter("oauth2AutoCreateDisabled") != null) {
-            param = "error=oauth2AutoCreateDisabled";
-        } else if (request.getParameter("oauth2_admin_blocked_user") != null) {
-            param = "erroroauth=oauth2_admin_blocked_user";
+        if (request.getParameter("oAuth2AuthenticationErrorWeb") != null) {
+            param = "errorOAuth=userAlreadyExistsWeb";
+        } else if ((errorMessage = request.getParameter("errorOAuth")) != null) {
+            param = "errorOAuth=" + sanitizeInput(errorMessage);
+        } else if (request.getParameter("oAuth2AutoCreateDisabled") != null) {
+            param = "errorOAuth=oAuth2AutoCreateDisabled";
+        } else if (request.getParameter("oAuth2AdminBlockedUser") != null) {
+            param = "errorOAuth=oAuth2AdminBlockedUser";
         } else if (request.getParameter("userIsDisabled") != null) {
-            param = "erroroauth=userIsDisabled";
-        } else if (request.getParameter("badcredentials") != null) {
-            param = "error=badcredentials";
+            param = "errorOAuth=userIsDisabled";
+        } else if ((errorMessage = request.getParameter("error")) != null) {
+            param = "errorOAuth=" + sanitizeInput(errorMessage);
+        } else if (request.getParameter("badCredentials") != null) {
+            param = "errorOAuth=badCredentials";
         }
 
         String redirectUrl = UrlUtils.getOrigin(request) + "/login?" + param;
@@ -180,18 +172,13 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                 log.info("Redirecting to Keycloak logout URL: {}", logoutUrl);
                 response.sendRedirect(logoutUrl);
             }
-            case "github" -> {
+            case "github", "google" -> {
                 log.info(
-                        "No redirect URL for GitHub. Redirecting to default logout URL: {}",
+                        "No redirect URL for {} available. Redirecting to default logout URL: {}",
+                        registrationId,
                         redirectUrl);
                 response.sendRedirect(redirectUrl);
             }
-            case "google" -> // String googleLogoutUrl =
-                // "https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue="
-                //                 + response.encodeRedirectURL(redirectUrl);
-                // log.info("Redirecting to Google logout URL: " + googleLogoutUrl);
-                // response.sendRedirect(googleLogoutUrl);
-                    log.info("Google does not have a specific logout URL");
             default -> {
                 log.info("Redirecting to default logout URL: {}", redirectUrl);
                 response.sendRedirect(redirectUrl);
@@ -199,7 +186,12 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
         }
     }
 
-    // Sanitize input to avoid potential security vulnerabilities
+    /**
+     * Sanitize input to avoid potential security vulnerabilities. Will return a sanitised <code>
+     * String</code>.
+     *
+     * @return a sanitised <code>String</code>
+     */
     private String sanitizeInput(String input) {
         return input.replaceAll("[^a-zA-Z0-9 ]", "");
     }

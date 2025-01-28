@@ -125,41 +125,41 @@ public class AccountWebController {
 
         if (error != null) {
             switch (error) {
-                case "badcredentials" -> error = "login.invalid";
+                case "badCredentials" -> error = "login.invalid";
                 case "locked" -> error = "login.locked";
                 case "oauth2AuthenticationError" -> error = "userAlreadyExistsOAuthMessage";
             }
 
             model.addAttribute("error", error);
         }
-        String erroroauth = request.getParameter("erroroauth");
-        if (erroroauth != null) {
-            switch (erroroauth) {
-                case "oauth2AutoCreateDisabled" -> erroroauth = "login.oauth2AutoCreateDisabled";
-                case "invalidUsername" -> erroroauth = "login.invalid";
-                case "userAlreadyExistsWeb" -> erroroauth = "userAlreadyExistsWebMessage";
-                case "oauth2AuthenticationErrorWeb" -> erroroauth = "login.oauth2InvalidUserType";
-                case "invalid_token_response" -> erroroauth = "login.oauth2InvalidTokenResponse";
+        String errorOAuth = request.getParameter("errorOAuth");
+        if (errorOAuth != null) {
+            switch (errorOAuth) {
+                case "oAuth2AutoCreateDisabled" -> errorOAuth = "login.oAuth2AutoCreateDisabled";
+                case "invalidUsername" -> errorOAuth = "login.invalid";
+                case "userAlreadyExistsWeb" -> errorOAuth = "userAlreadyExistsWebMessage";
+                case "oAuth2AuthenticationErrorWeb" -> errorOAuth = "login.oauth2InvalidUserType";
+                case "invalid_token_response" -> errorOAuth = "login.oauth2InvalidTokenResponse";
                 case "authorization_request_not_found" ->
-                        erroroauth = "login.oauth2RequestNotFound";
-                case "access_denied" -> erroroauth = "login.oauth2AccessDenied";
+                        errorOAuth = "login.oauth2RequestNotFound";
+                case "access_denied" -> errorOAuth = "login.oauth2AccessDenied";
                 case "invalid_user_info_response" ->
-                        erroroauth = "login.oauth2InvalidUserInfoResponse";
-                case "invalid_request" -> erroroauth = "login.oauth2invalidRequest";
-                case "invalid_id_token" -> erroroauth = "login.oauth2InvalidIdToken";
-                case "oauth2_admin_blocked_user" -> erroroauth = "login.oauth2AdminBlockedUser";
-                case "userIsDisabled" -> erroroauth = "login.userIsDisabled";
-                case "invalid_destination" -> erroroauth = "login.invalid_destination";
+                        errorOAuth = "login.oauth2InvalidUserInfoResponse";
+                case "invalid_request" -> errorOAuth = "login.oauth2invalidRequest";
+                case "invalid_id_token" -> errorOAuth = "login.oauth2InvalidIdToken";
+                case "oAuth2AdminBlockedUser" -> errorOAuth = "login.oAuth2AdminBlockedUser";
+                case "userIsDisabled" -> errorOAuth = "login.userIsDisabled";
+                case "invalid_destination" -> errorOAuth = "login.invalid_destination";
                 case "relying_party_registration_not_found" ->
-                        erroroauth = "login.relyingPartyRegistrationNotFound";
+                        errorOAuth = "login.relyingPartyRegistrationNotFound";
                 // Valid InResponseTo was not available from the validation context, unable to
                 // evaluate
-                case "invalid_in_response_to" -> erroroauth = "login.invalid_in_response_to";
+                case "invalid_in_response_to" -> errorOAuth = "login.invalid_in_response_to";
                 case "not_authentication_provider_found" ->
-                        erroroauth = "login.not_authentication_provider_found";
+                        errorOAuth = "login.not_authentication_provider_found";
             }
 
-            model.addAttribute("erroroauth", erroroauth);
+            model.addAttribute("errorOAuth", errorOAuth);
         }
 
         if (request.getParameter("messageType") != null) {
