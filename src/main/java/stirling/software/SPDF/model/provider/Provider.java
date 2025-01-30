@@ -57,9 +57,7 @@ public class Provider {
 
     @Override
     public String toString() {
-        return "Provider [issuer="
-                + getIssuer()
-                + ", name="
+        return "Provider [name="
                 + getName()
                 + ", clientName="
                 + getClientName()

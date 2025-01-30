@@ -169,7 +169,9 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
     }
 
     /**
-     * Handles different error scenarios during logout. Will return a <code>String</code> containing the error request parameter.
+     * Handles different error scenarios during logout. Will return a <code>String</code> containing
+     * the error request parameter.
+     *
      * @param request the user's <code>HttpServletRequest</code> request.
      * @return a <code>String</code> containing the error request parameter.
      */

@@ -28,6 +28,7 @@ import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2.Client;
 import stirling.software.SPDF.model.User;
+import stirling.software.SPDF.model.exception.NoProviderFoundException;
 import stirling.software.SPDF.model.provider.GitHubProvider;
 import stirling.software.SPDF.model.provider.GoogleProvider;
 import stirling.software.SPDF.model.provider.KeycloakProvider;
@@ -51,7 +52,8 @@ public class OAuth2Configuration {
 
     @Bean
     @ConditionalOnProperty(value = "security.oauth2.enabled", havingValue = "true")
-    public ClientRegistrationRepository clientRegistrationRepository() {
+    public ClientRegistrationRepository clientRegistrationRepository()
+            throws NoProviderFoundException {
         List<ClientRegistration> registrations = new ArrayList<>();
         githubClientRegistration().ifPresent(registrations::add);
         oidcClientRegistration().ifPresent(registrations::add);
@@ -59,8 +61,8 @@ public class OAuth2Configuration {
         keycloakClientRegistration().ifPresent(registrations::add);
 
         if (registrations.isEmpty()) {
-            log.error("At least one OAuth2 provider must be configured");
-            System.exit(1);
+            log.error("No OAuth2 provider registered");
+            throw new NoProviderFoundException("At least one OAuth2 provider must be configured.");
         }
 
         return new InMemoryClientRegistrationRepository(registrations);
@@ -69,7 +71,7 @@ public class OAuth2Configuration {
     private Optional<ClientRegistration> keycloakClientRegistration() {
         OAUTH2 oauth2 = applicationProperties.getSecurity().getOauth2();
 
-        if (isOauthOrClientEmpty(oauth2)) {
+        if (isOAuth2Enabled(oauth2) || isClientInitialised(oauth2)) {
             return Optional.empty();
         }
 
@@ -97,13 +99,13 @@ public class OAuth2Configuration {
     }
 
     private Optional<ClientRegistration> googleClientRegistration() {
-        OAUTH2 oauth2 = applicationProperties.getSecurity().getOauth2();
+        OAUTH2 oAuth2 = applicationProperties.getSecurity().getOauth2();
 
-        if (isOauthOrClientEmpty(oauth2)) {
+        if (isOAuth2Enabled(oAuth2) || isClientInitialised(oAuth2)) {
             return Optional.empty();
         }
 
-        Client client = oauth2.getClient();
+        Client client = oAuth2.getClient();
         GoogleProvider googleClient = client.getGoogle();
         Provider google =
                 new GoogleProvider(
@@ -130,13 +132,13 @@ public class OAuth2Configuration {
     }
 
     private Optional<ClientRegistration> githubClientRegistration() {
-        OAUTH2 oauth2 = applicationProperties.getSecurity().getOauth2();
+        OAUTH2 oAuth2 = applicationProperties.getSecurity().getOauth2();
 
-        if (isOauthOrClientEmpty(oauth2)) {
+        if (isOAuth2Enabled(oAuth2)) {
             return Optional.empty();
         }
 
-        Client client = oauth2.getClient();
+        Client client = oAuth2.getClient();
         GitHubProvider githubClient = client.getGithub();
         Provider github =
                 new GitHubProvider(
@@ -165,7 +167,7 @@ public class OAuth2Configuration {
     private Optional<ClientRegistration> oidcClientRegistration() {
         OAUTH2 oauth = applicationProperties.getSecurity().getOauth2();
 
-        if (isOauthOrClientEmpty(oauth)) {
+        if (isOAuth2Enabled(oauth) || isClientInitialised(oauth)) {
             return Optional.empty();
         }
 
@@ -194,12 +196,12 @@ public class OAuth2Configuration {
                         .build());
     }
 
-    private boolean isOauthOrClientEmpty(OAUTH2 oauth) {
-        if (oauth == null || !oauth.getEnabled()) {
-            return false;
-        }
+    private boolean isOAuth2Enabled(OAUTH2 oAuth2) {
+        return oAuth2 == null || !oAuth2.getEnabled();
+    }
 
-        Client client = oauth.getClient();
+    private boolean isClientInitialised(OAUTH2 oauth2) {
+        Client client = oauth2.getClient();
         return client == null;
     }
 

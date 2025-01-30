@@ -114,7 +114,7 @@ public class AccountWebController {
         providerList
                 .entrySet()
                 .removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
-        model.addAttribute("providerlist", providerList);
+        model.addAttribute("providerList", providerList);
         model.addAttribute("loginMethod", securityProps.getLoginMethod());
 
         boolean altLogin = !providerList.isEmpty() ? securityProps.isAltLogin() : false;

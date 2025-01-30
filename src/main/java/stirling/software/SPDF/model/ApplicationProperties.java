@@ -245,11 +245,11 @@ public class ApplicationProperties {
             }
 
             public boolean isSettingsValid() {
-                return isStringEmpty(this.getIssuer())
-                        && isStringEmpty(this.getClientId())
-                        && isStringEmpty(this.getClientSecret())
-                        && isCollectionEmpty(this.getScopes())
-                        && isStringEmpty(this.getUseAsUsername());
+                return !isStringEmpty(this.getIssuer())
+                        && !isStringEmpty(this.getClientId())
+                        && !isStringEmpty(this.getClientSecret())
+                        && !isCollectionEmpty(this.getScopes())
+                        && !isStringEmpty(this.getUseAsUsername());
             }
 
             @Data
