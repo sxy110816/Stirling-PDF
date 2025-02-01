@@ -219,9 +219,7 @@ public class OAuth2Configuration {
      */
 
     @Bean
-    @ConditionalOnProperty(
-            value = "security.oauth2.enabled",
-            havingValue = "true")
+    @ConditionalOnProperty(value = "security.oauth2.enabled", havingValue = "true")
     GrantedAuthoritiesMapper userAuthoritiesMapper() {
         return (authorities) -> {
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>();

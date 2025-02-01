@@ -258,7 +258,7 @@ public class SecurityConfiguration {
             }
             // Handle SAML
             if (applicationProperties.getSecurity().isSaml2Active()) {
-                // && runningEE
+                // todo: && runningEE
                 // Configure the authentication provider
                 OpenSaml4AuthenticationProvider authenticationProvider =
                         new OpenSaml4AuthenticationProvider();
@@ -314,7 +314,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public boolean activSecurity() {
+    public boolean activeSecurity() {
         return true;
     }
 }
