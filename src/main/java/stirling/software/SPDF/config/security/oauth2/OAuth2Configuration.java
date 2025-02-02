@@ -184,7 +184,7 @@ public class OAuth2Configuration {
                         oauth.getClientId(),
                         oauth.getClientSecret(),
                         oauth.getScopes(),
-                        UsernameAttribute.valueOf(oauth.getUseAsUsername().toUpperCase()),
+                        UsernameAttribute.valueOf(oauth.getUseAsUsername()),
                         null,
                         null,
                         null);

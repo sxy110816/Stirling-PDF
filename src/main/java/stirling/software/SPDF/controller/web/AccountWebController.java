@@ -114,7 +114,8 @@ public class AccountWebController {
         providerList
                 .entrySet()
                 .removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
-        model.addAttribute("providerList", providerList);
+        model.addAttribute(
+                "providerList", providerList); // todo: might need to change back to 'providerlist'
         model.addAttribute("loginMethod", securityProps.getLoginMethod());
 
         boolean altLogin = !providerList.isEmpty() ? securityProps.isAltLogin() : false;
@@ -132,7 +133,9 @@ public class AccountWebController {
 
             model.addAttribute("error", error);
         }
+
         String errorOAuth = request.getParameter("errorOAuth");
+
         if (errorOAuth != null) {
             switch (errorOAuth) {
                 case "oAuth2AutoCreateDisabled" -> errorOAuth = "login.oAuth2AutoCreateDisabled";
@@ -345,7 +348,7 @@ public class AccountWebController {
                 // Fetch user details from the database, assuming findByUsername method exists
                 Optional<User> user = userRepository.findByUsernameIgnoreCaseWithSettings(username);
 
-                if (!user.isPresent()) {
+                if (user.isEmpty()) {
                     return "redirect:/error";
                 }
                 // Convert settings map to JSON string

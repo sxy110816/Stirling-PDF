@@ -16,6 +16,8 @@ import stirling.software.SPDF.model.exception.UnsupportedUsernameAttribute;
 @NoArgsConstructor
 public class Provider {
 
+    public static final String EXCEPTION_MESSAGE = "The attribute %s is not supported for %s.";
+
     private String issuer;
     private String name;
     private String clientName;
@@ -83,41 +85,29 @@ public class Provider {
             }
             default ->
                     throw new UnsupportedUsernameAttribute(
-                            "The attribute "
-                                    + usernameAttribute
-                                    + "is not supported for "
-                                    + clientName
-                                    + ".");
+                            String.format(EXCEPTION_MESSAGE, usernameAttribute, clientName));
         }
     }
 
     private UsernameAttribute validateGoogleUsernameAttribute(UsernameAttribute usernameAttribute) {
         switch (usernameAttribute) {
-            case EMAIL, NAME, GIVEN_NAME, PREFERRED_NAME -> {
+            case EMAIL, NAME, GIVEN_NAME, FAMILY_NAME -> {
                 return usernameAttribute;
             }
             default ->
                     throw new UnsupportedUsernameAttribute(
-                            "The attribute "
-                                    + usernameAttribute
-                                    + "is not supported for "
-                                    + clientName
-                                    + ".");
+                            String.format(EXCEPTION_MESSAGE, usernameAttribute, clientName));
         }
     }
 
     private UsernameAttribute validateGitHubUsernameAttribute(UsernameAttribute usernameAttribute) {
         switch (usernameAttribute) {
-            case EMAIL, NAME, LOGIN -> {
+            case LOGIN, EMAIL, NAME -> {
                 return usernameAttribute;
             }
             default ->
                     throw new UnsupportedUsernameAttribute(
-                            "The attribute "
-                                    + usernameAttribute
-                                    + "is not supported for "
-                                    + clientName
-                                    + ".");
+                            String.format(EXCEPTION_MESSAGE, usernameAttribute, clientName));
         }
     }
 
