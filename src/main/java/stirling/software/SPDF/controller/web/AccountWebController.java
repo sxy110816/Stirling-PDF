@@ -111,11 +111,11 @@ public class AccountWebController {
         }
 
         // Remove any null keys/values from the providerList
+        // providerList might be empty on browser side? Button not showing up
         providerList
                 .entrySet()
                 .removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
-        model.addAttribute(
-                "providerList", providerList); // todo: might need to change back to 'providerlist'
+        model.addAttribute("providerList", providerList);
         model.addAttribute("loginMethod", securityProps.getLoginMethod());
 
         boolean altLogin = !providerList.isEmpty() ? securityProps.isAltLogin() : false;

@@ -2,8 +2,8 @@ package stirling.software.SPDF.config.security.saml2;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-import java.util.UUID;
 
+import java.util.UUID;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +37,7 @@ public class SAML2Configuration {
     @ConditionalOnProperty(name = "security.saml2.enabled", havingValue = "true")
     public RelyingPartyRegistrationRepository relyingPartyRegistrations() throws Exception {
         SAML2 samlConf = applicationProperties.getSecurity().getSaml2();
-        X509Certificate idpCert = CertificateUtils.readCertificate(samlConf.getidpCert());
+        X509Certificate idpCert = CertificateUtils.readCertificate(samlConf.getIdpCert());
         Saml2X509Credential verificationCredential = Saml2X509Credential.verification(idpCert);
         Resource privateKeyResource = samlConf.getPrivateKey();
         Resource certificateResource = samlConf.getSpCert();
@@ -73,9 +73,9 @@ public class SAML2Configuration {
                 customizer -> {
                     log.debug("Customizing SAML Authentication request");
                     AuthnRequest authnRequest = customizer.getAuthnRequest();
-                    log.debug("AuthnRequest ID: {}", authnRequest.getID());
+                                        log.debug("AuthnRequest ID: {}", authnRequest.getID());
                     if (authnRequest.getID() == null) {
-                        authnRequest.setID("ARQ" + UUID.randomUUID().toString());
+                        authnRequest.setID("ARQ" + UUID.randomUUID()); // fixme: SubjectConfirmationData@InResponseTo
                     }
                     log.debug("AuthnRequest new ID after set: {}", authnRequest.getID());
                     log.debug("AuthnRequest IssueInstant: {}", authnRequest.getIssueInstant());

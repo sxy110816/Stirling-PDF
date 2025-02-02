@@ -17,7 +17,7 @@ security:
   loginAttemptCount: 5 # lock user account after 5 tries; when using e.g. Fail2Ban you can deactivate the function with -1
   loginResetTimeMinutes: 120 # lock account for 2 hours after x attempts
   loginMethod: saml2 # Accepts values like 'all' and 'normal'(only Login with Username/Password), 'oauth2'(only Login with OAuth2) or 'saml2'(only Login with SAML2)
-  customGlobalAPIKey: 3R3T-WFPY-UNRW-LJFA-MMXM-YVJK-WCKY-PCRT # todo: this is in ApplicationProperties but not here. Should we add it
+  customGlobalAPIKey: 3R3T-WFPY-UNRW-LJFA-MMXM-YVJK-WCKY-PCRT # todo: this is in ApplicationProperties but not here. Should we add it?
   initialLogin:
     username: '' # initial username for the first login
     password: '' # initial password for the first login
@@ -52,14 +52,14 @@ security:
     enabled: false # Only enabled for paid enterprise clients (enterpriseEdition.enabled must be true)
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
-    registrationId: stirling
-    idpMetadataUri: https://dev-XXXXXXXX.okta.com/app/externalKey/sso/saml/metadata
-    idpSingleLogoutUrl: https://dev-XXXXXXXX.okta.com/app/dev-XXXXXXXX_stirlingpdf_1/externalKey/slo/saml
-    idpSingleLoginUrl: https://dev-XXXXXXXX.okta.com/app/dev-XXXXXXXX_stirlingpdf_1/externalKey/sso/saml
-    idpIssuer: http://www.okta.com/externalKey
-    idpCert: classpath:okta.crt
-    privateKey: classpath:saml-private-key.key
-    spCert: classpath:saml-public-cert.crt
+    registrationId: stirlingpdf-dario-saml
+    idpMetadataUri: https://authentik.dev.stirlingpdf.com/api/v3/providers/saml/5/metadata/?download
+    idpSingleLoginUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/sso/binding/post/
+    idpSingleLogoutUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/slo/binding/post/
+    idpIssuer: authentik
+    idpCert: classpath:authentik-Self-signed_Certificate_certificate.pem
+    privateKey: classpath:private_key.key
+    spCert: classpath:certificate.crt
 
 enterpriseEdition:
   enabled: false # set to 'true' to enable enterprise edition
@@ -81,7 +81,7 @@ legal:
 system:
   defaultLocale: en-US # set the default language (e.g. 'de-DE', 'fr-FR', etc)
   googlevisibility: false # 'true' to allow Google visibility (via robots.txt), 'false' to disallow
-  enableAlphaFunctionality: false # set to enable functionality which might need more testing before it fully goes live (this feature might make no changes)
+  enableAlphaFunctionality: true # set to enable functionality which might need more testing before it fully goes live (this feature might make no changes)
   showUpdate: false # see when a new update is available
   showUpdateOnlyAdmin: false # only admins can see when a new update is available, depending on showUpdate it must be set to 'true'
   customHTMLFiles: false # enable to have files placed in /customFiles/templates override the existing template HTML files

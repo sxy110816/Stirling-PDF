@@ -32,6 +32,6 @@ public class CustomSaml2AuthenticationFailureHandler extends SimpleUrlAuthentica
                             response,
                             "/login?errorOAuth=not_authentication_provider_found");
         }
-        log.error("AuthenticationException: " + exception);
+        log.error("Authentication error", exception);
     }
 }

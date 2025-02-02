@@ -197,7 +197,7 @@ public class ApplicationProperties {
                 }
             }
 
-            public Resource getidpCert() {
+            public Resource getIdpCert() {
                 if (idpCert == null) return null;
                 if (idpCert.startsWith("classpath:")) {
                     return new ClassPathResource(idpCert.substring("classpath:".length()));
