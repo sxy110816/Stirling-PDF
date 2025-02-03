@@ -17,7 +17,7 @@ security:
   loginAttemptCount: 5 # lock user account after 5 tries; when using e.g. Fail2Ban you can deactivate the function with -1
   loginResetTimeMinutes: 120 # lock account for 2 hours after x attempts
   loginMethod: saml2 # Accepts values like 'all' and 'normal'(only Login with Username/Password), 'oauth2'(only Login with OAuth2) or 'saml2'(only Login with SAML2)
-  customGlobalAPIKey: 3R3T-WFPY-UNRW-LJFA-MMXM-YVJK-WCKY-PCRT # todo: this is in ApplicationProperties but not here. Should we add it?
+  customGlobalAPIKey: '' # todo: this is in ApplicationProperties but not here. Should we add it?
   initialLogin:
     username: '' # initial username for the first login
     password: '' # initial password for the first login
@@ -43,6 +43,7 @@ security:
     issuer: 'https://authentik.dev.stirlingpdf.com/application/o/stirlingpdf-oauth/' # set to any provider that supports OpenID Connect Discovery (/.well-known/openid-configuration) endpoint
     clientId: '5ibI9Ud5cRNFIcS1gIJME0shO6VZOy6Ae6XUrZL0' # client ID from your provider
     clientSecret: 'DFSD3B7MKLkWuEAasxxm2hghuzulPr37jdkrojPsGBz9MGwkfc' # client secret from your provider
+    logoutUrl: ''
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
     useAsUsername: email # default is 'email'; custom fields can be used as the username
