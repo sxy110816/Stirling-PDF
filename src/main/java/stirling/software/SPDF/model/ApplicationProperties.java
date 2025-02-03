@@ -227,6 +227,7 @@ public class ApplicationProperties {
             private Collection<String> scopes = new ArrayList<>();
             private String provider;
             private Client client = new Client();
+            private String logoutUrl;
 
             public void setScopes(String scopes) {
                 List<String> scopesList =

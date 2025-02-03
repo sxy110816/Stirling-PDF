@@ -21,6 +21,8 @@ public class CustomSaml2AuthenticationFailureHandler extends SimpleUrlAuthentica
             HttpServletResponse response,
             AuthenticationException exception)
             throws IOException {
+        log.error("Authentication error", exception);
+
         if (exception instanceof Saml2AuthenticationException) {
             Saml2Error error = ((Saml2AuthenticationException) exception).getSaml2Error();
             getRedirectStrategy()
@@ -32,6 +34,5 @@ public class CustomSaml2AuthenticationFailureHandler extends SimpleUrlAuthentica
                             response,
                             "/login?errorOAuth=not_authentication_provider_found");
         }
-        log.error("Authentication error", exception);
     }
 }

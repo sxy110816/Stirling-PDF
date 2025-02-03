@@ -2,8 +2,8 @@ package stirling.software.SPDF.config.security.saml2;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-
 import java.util.UUID;
+
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -49,15 +49,23 @@ public class SAML2Configuration {
         RelyingPartyRegistration rp =
                 RelyingPartyRegistration.withRegistrationId(samlConf.getRegistrationId())
                         .signingX509Credentials(c -> c.add(signingCredential))
+                        .entityId(samlConf.getIdpIssuer())
+                        .singleLogoutServiceBinding(Saml2MessageBinding.POST)
+                        .singleLogoutServiceLocation(samlConf.getIdpSingleLogoutUrl())
+                        .authnRequestsSigned(true)
                         .assertingPartyMetadata(
                                 metadata ->
                                         metadata.entityId(samlConf.getIdpIssuer())
-                                                .singleSignOnServiceLocation(
-                                                        samlConf.getIdpSingleLoginUrl())
                                                 .verificationX509Credentials(
                                                         c -> c.add(verificationCredential))
                                                 .singleSignOnServiceBinding(
                                                         Saml2MessageBinding.POST)
+                                                .singleSignOnServiceLocation(
+                                                        samlConf.getIdpSingleLoginUrl())
+                                                .singleLogoutServiceBinding(
+                                                        Saml2MessageBinding.POST)
+                                                .singleLogoutServiceLocation(
+                                                        samlConf.getIdpSingleLogoutUrl())
                                                 .wantAuthnRequestsSigned(true))
                         .build();
         return new InMemoryRelyingPartyRegistrationRepository(rp);
@@ -73,9 +81,9 @@ public class SAML2Configuration {
                 customizer -> {
                     log.debug("Customizing SAML Authentication request");
                     AuthnRequest authnRequest = customizer.getAuthnRequest();
-                                        log.debug("AuthnRequest ID: {}", authnRequest.getID());
+                    log.debug("AuthnRequest ID: {}", authnRequest.getID());
                     if (authnRequest.getID() == null) {
-                        authnRequest.setID("ARQ" + UUID.randomUUID()); // fixme: SubjectConfirmationData@InResponseTo
+                        authnRequest.setID("ARQ" + UUID.randomUUID());
                     }
                     log.debug("AuthnRequest new ID after set: {}", authnRequest.getID());
                     log.debug("AuthnRequest IssueInstant: {}", authnRequest.getIssueInstant());
@@ -94,12 +102,11 @@ public class SAML2Configuration {
                     // Log headers
                     Collections.list(request.getHeaderNames())
                             .forEach(
-                                    headerName -> {
-                                        log.debug(
-                                                "Header - {}: {}",
-                                                headerName,
-                                                request.getHeader(headerName));
-                                    });
+                                    headerName ->
+                                            log.debug(
+                                                    "Header - {}: {}",
+                                                    headerName,
+                                                    request.getHeader(headerName)));
                     // Log SAML specific parameters
                     log.debug("SAML Request Parameters:");
                     log.debug("SAMLRequest: {}", request.getParameter("SAMLRequest"));

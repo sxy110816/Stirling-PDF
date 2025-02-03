@@ -111,7 +111,6 @@ public class AccountWebController {
         }
 
         // Remove any null keys/values from the providerList
-        // providerList might be empty on browser side? Button not showing up
         providerList
                 .entrySet()
                 .removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
@@ -216,13 +215,11 @@ public class AccountWebController {
                                     .plus(maxInactiveInterval, ChronoUnit.SECONDS);
                     if (now.isAfter(expirationTime)) {
                         sessionPersistentRegistry.expireSession(sessionEntity.getSessionId());
-                        hasActiveSession = false;
                     } else {
                         hasActiveSession = !sessionEntity.isExpired();
                     }
                     lastRequest = sessionEntity.getLastRequest();
                 } else {
-                    hasActiveSession = false;
                     // No session, set default last request time
                     lastRequest = new Date(0);
                 }
@@ -259,53 +256,41 @@ public class AccountWebController {
                                 })
                         .collect(Collectors.toList());
         String messageType = request.getParameter("messageType");
-        String deleteMessage = null;
+
+        String deleteMessage;
         if (messageType != null) {
-            switch (messageType) {
-                case "deleteCurrentUser":
-                    deleteMessage = "deleteCurrentUserMessage";
-                    break;
-                case "deleteUsernameExists":
-                    deleteMessage = "deleteUsernameExistsMessage";
-                    break;
-                default:
-                    break;
-            }
+            deleteMessage =
+                    switch (messageType) {
+                        case "deleteCurrentUser" -> "deleteCurrentUserMessage";
+                        case "deleteUsernameExists" -> "deleteUsernameExistsMessage";
+                        default -> null;
+                    };
+
             model.addAttribute("deleteMessage", deleteMessage);
-            String addMessage = null;
-            switch (messageType) {
-                case "usernameExists":
-                    addMessage = "usernameExistsMessage";
-                    break;
-                case "invalidUsername":
-                    addMessage = "invalidUsernameMessage";
-                    break;
-                case "invalidPassword":
-                    addMessage = "invalidPasswordMessage";
-                    break;
-                default:
-                    break;
-            }
+
+            String addMessage;
+            addMessage =
+                    switch (messageType) {
+                        case "usernameExists" -> "usernameExistsMessage";
+                        case "invalidUsername" -> "invalidUsernameMessage";
+                        case "invalidPassword" -> "invalidPasswordMessage";
+                        default -> null;
+                    };
             model.addAttribute("addMessage", addMessage);
         }
-        String changeMessage = null;
+
+        String changeMessage;
         if (messageType != null) {
-            switch (messageType) {
-                case "userNotFound":
-                    changeMessage = "userNotFoundMessage";
-                    break;
-                case "downgradeCurrentUser":
-                    changeMessage = "downgradeCurrentUserMessage";
-                    break;
-                case "disabledCurrentUser":
-                    changeMessage = "disabledCurrentUserMessage";
-                    break;
-                default:
-                    changeMessage = messageType;
-                    break;
-            }
+            changeMessage =
+                    switch (messageType) {
+                        case "userNotFound" -> "userNotFoundMessage";
+                        case "downgradeCurrentUser" -> "downgradeCurrentUserMessage";
+                        case "disabledCurrentUser" -> "disabledCurrentUserMessage";
+                        default -> messageType;
+                    };
             model.addAttribute("changeMessage", changeMessage);
         }
+
         model.addAttribute("users", sortedUsers);
         model.addAttribute("currentUsername", authentication.getName());
         model.addAttribute("roleDetails", roleDetails);
@@ -326,39 +311,35 @@ public class AccountWebController {
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
             String username = null;
+
+            // Retrieve username and other attributes and add login attributes to the model
             if (principal instanceof UserDetails userDetails) {
-                // Retrieve username and other attributes
                 username = userDetails.getUsername();
-                // Add oAuth2 Login attributes to the model
                 model.addAttribute("oAuth2Login", false);
             }
             if (principal instanceof OAuth2User userDetails) {
-                // Retrieve username and other attributes
                 username = userDetails.getName();
-                // Add oAuth2 Login attributes to the model
                 model.addAttribute("oAuth2Login", true);
             }
             if (principal instanceof CustomSaml2AuthenticatedPrincipal userDetails) {
-                // Retrieve username and other attributes
                 username = userDetails.getName();
-                // Add oAuth2 Login attributes to the model
-                model.addAttribute("oAuth2Login", true);
+                model.addAttribute("saml2Login", true);
             }
             if (username != null) {
-                // Fetch user details from the database, assuming findByUsername method exists
+                // Fetch user details from the database
                 Optional<User> user = userRepository.findByUsernameIgnoreCaseWithSettings(username);
 
                 if (user.isEmpty()) {
                     return "redirect:/error";
                 }
+
                 // Convert settings map to JSON string
                 ObjectMapper objectMapper = new ObjectMapper();
                 String settingsJson;
                 try {
                     settingsJson = objectMapper.writeValueAsString(user.get().getSettings());
                 } catch (JsonProcessingException e) {
-                    // Handle JSON conversion error
-                    log.error("exception", e);
+                    log.error("Error converting settings map", e);
                     return "redirect:/error";
                 }
 
@@ -372,7 +353,7 @@ public class AccountWebController {
                         case "invalidUsername" -> messageType = "invalidUsernameMessage";
                     }
                 }
-                // Add attributes to the model
+
                 model.addAttribute("username", username);
                 model.addAttribute("messageType", messageType);
                 model.addAttribute("role", user.get().getRolesAsString());
@@ -395,19 +376,12 @@ public class AccountWebController {
         }
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
-            if (principal instanceof UserDetails) {
-                // Cast the principal object to UserDetails
-                UserDetails userDetails = (UserDetails) principal;
-                // Retrieve username and other attributes
+            if (principal instanceof UserDetails userDetails) {
                 String username = userDetails.getUsername();
                 // Fetch user details from the database
-                Optional<User> user =
-                        userRepository
-                                .findByUsernameIgnoreCase( // Assuming findByUsername method exists
-                                        username);
-                if (!user.isPresent()) {
-                    // Handle error appropriately
-                    // Example redirection in case of error
+                Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
+                if (user.isEmpty()) {
+                    // Handle error appropriately, example redirection in case of error
                     return "redirect:/error";
                 }
                 String messageType = request.getParameter("messageType");
@@ -430,7 +404,7 @@ public class AccountWebController {
                     }
                     model.addAttribute("messageType", messageType);
                 }
-                // Add attributes to the model
+
                 model.addAttribute("username", username);
             }
         } else {
