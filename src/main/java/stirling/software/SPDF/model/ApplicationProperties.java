@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -138,13 +137,13 @@ public class ApplicationProperties {
                     || loginMethod.equalsIgnoreCase(LoginMethods.ALL.toString()));
         }
 
-        public boolean isOauth2Activ() {
+        public boolean isOauth2Active() {
             return (oauth2 != null
                     && oauth2.getEnabled()
                     && !loginMethod.equalsIgnoreCase(LoginMethods.NORMAL.toString()));
         }
 
-        public boolean isSaml2Activ() {
+        public boolean isSaml2Active() {
             return (saml2 != null
                     && saml2.getEnabled()
                     && !loginMethod.equalsIgnoreCase(LoginMethods.NORMAL.toString()));
