@@ -230,9 +230,7 @@ public class ApplicationProperties {
 
             public void setScopes(String scopes) {
                 List<String> scopesList =
-                        Arrays.stream(scopes.split(","))
-                                .map(String::trim)
-                                .toList();
+                        Arrays.stream(scopes.split(",")).map(String::trim).toList();
                 this.scopes.addAll(scopesList);
             }
 
@@ -265,7 +263,9 @@ public class ApplicationProperties {
                         case "keycloak" -> getKeycloak();
                         default ->
                                 throw new UnsupportedProviderException(
-                                        "Logout from the provider " + registrationId + " is not supported. "
+                                        "Logout from the provider "
+                                                + registrationId
+                                                + " is not supported. "
                                                 + "Report it at https://github.com/Stirling-Tools/Stirling-PDF/issues");
                     };
                 }

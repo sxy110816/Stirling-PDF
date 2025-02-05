@@ -4,7 +4,12 @@ import static stirling.software.SPDF.utils.validation.Validator.validateProvider
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,11 +29,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import stirling.software.SPDF.config.security.saml2.CustomSaml2AuthenticatedPrincipal;
 import stirling.software.SPDF.config.security.session.SessionPersistentRegistry;
-import stirling.software.SPDF.model.*;
+import stirling.software.SPDF.model.ApplicationProperties;
 import stirling.software.SPDF.model.ApplicationProperties.Security;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2;
 import stirling.software.SPDF.model.ApplicationProperties.Security.OAUTH2.Client;
 import stirling.software.SPDF.model.ApplicationProperties.Security.SAML2;
+import stirling.software.SPDF.model.Authority;
+import stirling.software.SPDF.model.Role;
+import stirling.software.SPDF.model.SessionEntity;
+import stirling.software.SPDF.model.User;
 import stirling.software.SPDF.model.provider.GitHubProvider;
 import stirling.software.SPDF.model.provider.GoogleProvider;
 import stirling.software.SPDF.model.provider.KeycloakProvider;
@@ -107,7 +116,12 @@ public class AccountWebController {
 
         if (securityProps.isSaml2Active()
                 && applicationProperties.getSystem().getEnableAlphaFunctionality()) {
-            providerList.put("/saml2/authenticate/" + saml2.getRegistrationId(), "SAML 2");
+            String firstChar = String.valueOf(saml2.getIdpIssuer().charAt(0));
+            String idpIssuerName =
+                    saml2.getIdpIssuer().replaceFirst(firstChar, firstChar.toUpperCase());
+            providerList.put(
+                    "/saml2/authenticate/" + saml2.getRegistrationId(),
+                    idpIssuerName + " (SAML 2)");
         }
 
         // Remove any null keys/values from the providerList

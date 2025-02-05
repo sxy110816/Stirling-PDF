@@ -54,9 +54,9 @@ security:
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
     registrationId: stirlingpdf-dario-saml
-    idpMetadataUri: https://authentik.dev.stirlingpdf.com/api/v3/providers/saml/5/metadata/?download
-    idpSingleLoginUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/sso/binding/post/
-    idpSingleLogoutUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/slo/binding/post/
+    idpMetadataUri: https://authentik.dev.stirlingpdf.com/api/v3/providers/saml/5/metadata/?download # todo: remove
+    idpSingleLoginUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/sso/binding/post/ # todo: remove
+    idpSingleLogoutUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/slo/binding/post/ # todo: remove
     idpIssuer: authentik
     idpCert: classpath:authentik-Self-signed_Certificate_certificate.pem
     privateKey: classpath:private_key.key
