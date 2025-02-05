@@ -81,7 +81,7 @@ public class AccountWebController {
                     String firstChar = String.valueOf(oauth.getProvider().charAt(0));
                     String clientName =
                             oauth.getProvider().replaceFirst(firstChar, firstChar.toUpperCase());
-                    providerList.put(OAUTH_2_AUTHORIZATION + "oidc", clientName);
+                    providerList.put(OAUTH_2_AUTHORIZATION + oauth.getProvider(), clientName);
                 }
 
                 Client client = oauth.getClient();

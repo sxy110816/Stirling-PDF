@@ -16,13 +16,12 @@ security:
   csrfDisabled: false # set to 'true' to disable CSRF protection (not recommended for production)
   loginAttemptCount: 5 # lock user account after 5 tries; when using e.g. Fail2Ban you can deactivate the function with -1
   loginResetTimeMinutes: 120 # lock account for 2 hours after x attempts
-  loginMethod: saml2 # Accepts values like 'all' and 'normal'(only Login with Username/Password), 'oauth2'(only Login with OAuth2) or 'saml2'(only Login with SAML2)
-  customGlobalAPIKey: '' # todo: this is in ApplicationProperties but not here. Should we add it?
+  loginMethod: all # Accepts values like 'all' and 'normal'(only Login with Username/Password), 'oauth2'(only Login with OAuth2) or 'saml2'(only Login with SAML2)
   initialLogin:
     username: '' # initial username for the first login
     password: '' # initial password for the first login
   oauth2:
-    enabled: false # set to 'true' to enable login (Note: enableLogin must also be 'true' for this to work)
+    enabled: true # set to 'true' to enable login (Note: enableLogin must also be 'true' for this to work)
     client:
       keycloak:
         issuer: '' # URL of the Keycloak realm's OpenID Connect Discovery endpoint
@@ -40,25 +39,25 @@ security:
         clientSecret: '' # client secret for GitHub OAuth2
         scopes: read:user # scope for GitHub OAuth2
         useAsUsername: login # field to use as the username for GitHub OAuth2. Available options are: [email | login | name]
-    issuer: 'https://authentik.dev.stirlingpdf.com/application/o/stirlingpdf-oauth/' # set to any provider that supports OpenID Connect Discovery (/.well-known/openid-configuration) endpoint
-    clientId: '5ibI9Ud5cRNFIcS1gIJME0shO6VZOy6Ae6XUrZL0' # client ID from your provider
-    clientSecret: 'DFSD3B7MKLkWuEAasxxm2hghuzulPr37jdkrojPsGBz9MGwkfc' # client secret from your provider
+    issuer: https://trial-6373896.okta.com/home/okta_flow_sso/0oaok4lk1nVvNBnqK697/alnbibn6b0OPFATt20g7 # set to any provider that supports OpenID Connect Discovery (/.well-known/openid-configuration) endpoint
+    clientId: 0oaok4lk4eNm6PtFD697 # client ID from your provider
+    clientSecret: lmwlmxFZSJ0miOoRpUAKf2jg8tVPPXhUxgL2VB-b4uJfhnk4sI02YodKWRX8fLSq # client secret from your provider
     logoutUrl: ''
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
-    useAsUsername: email # default is 'email'; custom fields can be used as the username
-    scopes: openid, profile, email # specify the scopes for which the application will request permissions
+    useAsUsername: username # default is 'email'; custom fields can be used as the username
+    scopes: okta.users.read, okta.users.read.self, okta.users.manage.self, okta.groups.read # specify the scopes for which the application will request permissions
     provider: google # set this to your OAuth provider's name, e.g., 'google' or 'keycloak'
   saml2:
     enabled: false # Only enabled for paid enterprise clients (enterpriseEdition.enabled must be true)
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
     registrationId: stirlingpdf-dario-saml
-    idpMetadataUri: https://authentik.dev.stirlingpdf.com/api/v3/providers/saml/5/metadata/?download # todo: remove
-    idpSingleLoginUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/sso/binding/post/ # todo: remove
-    idpSingleLogoutUrl: https://authentik.dev.stirlingpdf.com/application/saml/stirlingpdf-dario-saml/slo/binding/post/ # todo: remove
-    idpIssuer: authentik
-    idpCert: classpath:authentik-Self-signed_Certificate_certificate.pem
+    idpMetadataUri: https://trial-6373896.okta.com/app/exkok5ozyuOz5fAyF697/sso/saml/metadata # todo: remove
+    idpSingleLoginUrl: https://trial-6373896.okta.com/app/generic-saml/exkok5ozyuOz5fAyF697/sso/saml # todo: remove
+    idpSingleLogoutUrl: https://trial-6373896.okta.com # todo: remove
+    idpIssuer: okta
+    idpCert: classpath:okta.cert
     privateKey: classpath:private_key.key
     spCert: classpath:certificate.crt
 
