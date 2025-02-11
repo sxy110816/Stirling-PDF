@@ -49,14 +49,15 @@ security:
     scopes: okta.users.read, okta.users.read.self, okta.users.manage.self, okta.groups.read # specify the scopes for which the application will request permissions
     provider: google # set this to your OAuth provider's name, e.g., 'google' or 'keycloak'
   saml2:
-    enabled: false # Only enabled for paid enterprise clients (enterpriseEdition.enabled must be true)
+    provider: okta
+    enabled: true # Only enabled for paid enterprise clients (enterpriseEdition.enabled must be true)
     autoCreateUser: true # set to 'true' to allow auto-creation of non-existing users
     blockRegistration: false # set to 'true' to deny login with SSO without prior registration by an admin
     registrationId: stirlingpdf-dario-saml
-    idpMetadataUri: https://trial-6373896.okta.com/app/exkok5ozyuOz5fAyF697/sso/saml/metadata # todo: remove
-    idpSingleLoginUrl: https://trial-6373896.okta.com/app/generic-saml/exkok5ozyuOz5fAyF697/sso/saml # todo: remove
-    idpSingleLogoutUrl: https://trial-6373896.okta.com # todo: remove
-    idpIssuer: okta
+    idpMetadataUri: https://trial-6373896.okta.com/app/exkomkf71reALy12X697/sso/saml/metadata # todo: remove
+    idpSingleLoginUrl: https://trial-6373896.okta.com/app/trial-6373896_stirlingpdfsaml2_1/exkoot0g5ipqOF3Bo697/sso/saml # todo: remove
+    idpSingleLogoutUrl: https://trial-6373896.okta.com/app/trial-6373896_stirlingpdfsaml2_1/exkoot0g5ipqOF3Bo697/slo/saml # todo: remove
+    idpIssuer: http://www.okta.com/exkoot0g5ipqOF3Bo697
     idpCert: classpath:okta.cert
     privateKey: classpath:private_key.key
     spCert: classpath:certificate.crt

@@ -159,6 +159,7 @@ public class ApplicationProperties {
         @Setter
         @ToString
         public static class SAML2 {
+            private String provider;
             private Boolean enabled = false;
             private Boolean autoCreateUser = false;
             private Boolean blockRegistration = false;
