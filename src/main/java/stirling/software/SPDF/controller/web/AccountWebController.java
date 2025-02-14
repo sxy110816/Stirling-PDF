@@ -116,12 +116,9 @@ public class AccountWebController {
 
         if (securityProps.isSaml2Active()
                 && applicationProperties.getSystem().getEnableAlphaFunctionality()) {
-            String firstChar = String.valueOf(saml2.getIdpIssuer().charAt(0));
-            String idpIssuerName =
-                    saml2.getIdpIssuer().replaceFirst(firstChar, firstChar.toUpperCase());
+            String samlIdp = saml2.getProvider();
             providerList.put(
-                    "/saml2/authenticate/" + saml2.getRegistrationId(),
-                    idpIssuerName + " (SAML 2)");
+                    "/saml2/authenticate/" + saml2.getRegistrationId(), samlIdp + " (SAML 2)");
         }
 
         // Remove any null keys/values from the providerList
